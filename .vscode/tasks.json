@@ -1,0 +1,35 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "HA-install-component-step1",
+            "type": "shell",
+            "command": "scp -r .\\custom_components\\${config:ha_custom_component_folder} ${config:ha_user_host}:/tmp",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "HA-install-component-step2",
+            "type": "shell",
+            "command": "ssh ${config:ha_user_host} '(cd /tmp ; sudo rm -rf ${config:ha_custom_component_host_path}/${config:ha_custom_component_folder} ; sudo mv ./${config:ha_custom_component_folder} ${config:ha_custom_component_host_path})'",
+            "dependsOn": [
+                "HA-install-component-step1"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "HA-install-component",
+            "type": "shell",
+            "command": "ssh ${config:ha_user_host} '(docker stop ${config:ha_docker_instance_id} ; sleep 7 ; docker start ${config:ha_docker_instance_id} ; echo done)'",
+            "dependsOn": [
+                "HA-install-component-step2"
+            ],
+            "problemMatcher": []
+        }
+    ]
+}
