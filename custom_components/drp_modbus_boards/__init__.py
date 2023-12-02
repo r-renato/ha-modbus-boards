@@ -408,6 +408,14 @@ SENSOR_SCHEMA = vol.All(
 
 BINARY_SENSOR_SCHEMA = BASE_COMPONENT_SCHEMA.extend(
     {
+        vol.Required(CONF_BINARY_SENSORS): vol.All(
+            cv.ensure_list, [vol.Schema({
+                                vol.Required(CONF_NAME): cv.string,
+                                vol.Optional(CONF_FRIENDLY_NAME): cv.string,
+                                vol.Optional(CONF_UNIQUE_ID): cv.string,
+                                vol.Optional(CONF_SCAN_INTERVAL): cv.positive_int,
+                            })]
+        ),
         vol.Optional(CONF_DEVICE_CLASS): BINARY_SENSOR_DEVICE_CLASSES_SCHEMA,
         vol.Optional(CONF_INPUT_TYPE, default=CALL_TYPE_COIL): vol.In(
             [

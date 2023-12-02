@@ -274,6 +274,22 @@ WAVESHARE_RTU_RELAY_REGISTERS = {
 }
 
 AERMEC_HMI080_REGISTERS = {
+    Platform.BINARY_SENSOR : {
+        "compressor_state": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x50, 1, CALL_TYPE_COIL, DataType.UINT16, 0, 1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+            None, None, None, "Compressor state",
+# entity    10:manufacturer, 11:model
+            "aermec", "hmi080"),
+        "odu_fan_state": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x51, 1, CALL_TYPE_COIL, DataType.UINT16, 0, 1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+            None, None, None, "ODU Fan State",
+# entity    10:manufacturer, 11:model
+            "aermec", "hmi080"),
+    },
     Platform.SWITCH : {
         "device_power_control": (
 # read      0:address, 1:function, 2:open, 3:close 
@@ -300,6 +316,141 @@ AERMEC_HMI080_REGISTERS = {
              "measurement", "temperature", "°C", "Temperature Outdoor",
 # entity    10:manufacturer, 11:model
             "aermec", "hmi080"),    
+        "temperature_discharge": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0077, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, 1, 0.1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+             "measurement", "temperature", "°C", "Temperature Discharge",
+# entity    10:manufacturer, 11:model
+            "aermec", "hmi080"),    
+        "temperature_defrost": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0078, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, 1, 0.1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+             "measurement", "temperature", "°C", "Temperature Defrost",
+# entity    10:manufacturer, 11:model
+            "aermec", "hmi080"),    
+        "temperature_suction": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0079, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, 1, 0.1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+             "measurement", "temperature", "°C", "Temperature Suction",
+# entity    10:manufacturer, 11:model
+            "aermec", "hmi080"),    
+        "temperature_economizer_in": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x007A, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, 1, 0.1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+             "measurement", "temperature", "°C", "Temperature Economizer In",
+# entity    10:manufacturer, 11:model
+            "aermec", "hmi080"), 
+        "temperature_economizer_out": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x007B, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, 1, 0.1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+             "measurement", "temperature", "°C", "Temperature Economizer Out",
+# entity    10:manufacturer, 11:model
+            "aermec", "hmi080"),    
+        "dis_pressure": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x007C, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, 1, 0.1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+             "measurement", "temperature", "°C", "Temperature Dis. pressure",
+# entity    10:manufacturer, 11:model
+            "aermec", "hmi080"),    
+        "temperature_t_water_out_pe": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x007D, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, 1, 0.1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+             "measurement", "temperature", "°C", "Temperature Water Out PE",
+# entity    10:manufacturer, 11:model
+            "aermec", "hmi080"),    
+        "temperature_t_optional_water_sen": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x007E, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, 1, 0.1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+             "measurement", "temperature", "°C", "Temperature T-optional water sen",
+# entity    10:manufacturer, 11:model
+            "aermec", "hmi080"),    
+        "temperature_t_water_in_pe": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x007F, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, 1, 0.1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+             "measurement", "temperature", "°C", "Temperature T-water in PE",
+# entity    10:manufacturer, 11:model
+            "aermec", "hmi080"),    
+        "temperature_t_tank_ctrl": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0080, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, 1, 0.1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+             "measurement", "temperature", "°C", "Temperature T-tank ctrl",
+# entity    10:manufacturer, 11:model
+            "aermec", "hmi080"),    
+        "temperature_t_remote_room": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0081, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, 1, 0.1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+             "measurement", "temperature", "°C", "Temperature T-remote room",
+# entity    10:manufacturer, 11:model
+            "aermec", "hmi080"),    
+        "temperature_t_gas_pipe": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0082, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, 1, 0.1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+             "measurement", "temperature", "°C", "Temperature T-gas pipe",
+# entity    10:manufacturer, 11:model
+            "aermec", "hmi080"),    
+        "temperature_t_liquid_pipe": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0083, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, 1, 0.1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+             "measurement", "temperature", "°C", "Temperature T-liquid pipe",
+# entity    10:manufacturer, 11:model
+            "aermec", "hmi080"),    
+        "temperature_thermostat": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0084, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, 1, 0.1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+             None, None, None, "Thermostat",
+# entity    10:manufacturer, 11:model
+            "aermec", "hmi080"),    
+        "temperature_t_floor_debug": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0085, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, 1, 0.1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+             "measurement", "temperature", "°C", "Temperature T-floor debug",
+# entity    10:manufacturer, 11:model
+            "aermec", "hmi080"),   
+        "debug_time": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0086, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, 1, 0.1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+             None, None, None, "Debug time",
+# entity    10:manufacturer, 11:model
+            "aermec", "hmi080"),   
+        "disinfection": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0087, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, 1, 0.1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+             None, None, None, "Disinfection",
+# entity    10:manufacturer, 11:model
+            "aermec", "hmi080"),   
+        "error_time_for_floor_debug": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0088, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, 1, 0.1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+             None, None, None, "Error Time for Floor Debug",
+# entity    10:manufacturer, 11:model
+            "aermec", "hmi080"),   
+        "temperature_t_weather_depend": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0089, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, 1, 0.1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+             None, None, None, "Temperature T-weather depend",
+# entity    10:manufacturer, 11:model
+            "aermec", "hmi080"),   
+
+
     },
     Platform.NUMBER : {
         "operational_mode": (
@@ -396,46 +547,485 @@ AERMEC_HMI080_REGISTERS = {
 # write     6:address, 7:function, 8:scale
             0x000A, CALL_TYPE_WRITE_REGISTERS, 1,
 # number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
-            7, 25, 1, "box",
+            20, 55, 1, "box",
 # entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
             "measurement", "temperature", "°C", "Operational WOT-Heat",
 # entity    17:manufacturer, 18:model
             "aermec", "hmi080"),
+        "operational_rt_cool": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x000B, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x000B, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            20, 60, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Operational RT-Cool",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_rt_heat": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x000C, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x000C, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            18, 30, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Operational RT-Heat",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_t_water_tank": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x000D, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x000D, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            40, 80, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Operational T-water tank",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_t_eheater": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x000E, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x000E, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            -20, 18, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Operational T-Eheater",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_t_other_switch_on": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x000F, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x000F, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            -20, 18, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Operational T-Other switch on",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_t_hp_max": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0010, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x0010, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            40, 55, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Operational T-HP max",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_upper_at_heat": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0011, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x0011, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            10, 37, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Operational Upper AT-Heat",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_lower_at_heat": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0012, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x0012, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            -20, 9, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Operational Lower AT-Heat",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_upper_rt_heat": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0013, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x0013, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            22, 30, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Operational Upper RT-Heats",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_lower_rt_heat": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0014, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x0014, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            18, 21, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Operational Lower RT-Heat",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_upper_wt_heat": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0015, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x0015, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            46, 60, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Operational Upper WT-Heat",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_lower_wt_heat": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0016, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x0016, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            36, 45, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Operational Lower WT-Heat",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_upper_at_cool": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0017, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x0017, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            26, 48, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Operational Upper AT-Cool",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_lower_at_cool": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0018, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x0018, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            10, 25, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Operational Lower AT-Cool",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_upper_rt_cool": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0019, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x0019, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            24, 30, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Operational Upper RT-Cool",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_lower_rt_cool": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x001A, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x001A, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            18, 23, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Operational Lower RT-Cool",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_upper_wt_cool": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x001B, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x001B, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            15, 25, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Operational Upper WT-Cool",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_lower_wt_cool": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x001C, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x001C, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            7, 14, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Operational Lower WT-Cool",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_delta_t_cool": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x001D, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x001D, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            2, 10, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Operational Delta-T-Cool",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_delta_t_heat": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x001E, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x001E, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            2, 10, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Operational Delta-T-Heat",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_delta_t_hot_water": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x001F, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x001F, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            2, 10, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Operational Delta-T-hot water",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_delta_t_room_temp": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0020, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x0020, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            1, 5, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Operational Delta-T-Room temp",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_cool_run_time": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0021, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x0021, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            1, 10, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            None, None, None, "Operational Cool run time",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_heat_run_time": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0022, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x0022, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            1, 10, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            None, None, None, "Operational Heat run time",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_other_thermal_logic": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0023, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x0023, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            1, 3, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            None, None, None, "Operational Other thermal logic",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_tank_heater": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0024, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x0024, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            1, 2, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            None, None, None, "Operational Tank heater",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_optional_e_heaterlogic": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0025, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x0025, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            1, 2, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            None, None, None, "Operational Optional E-Heaterlogic",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_current_limit_value": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0026, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x0026, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            0, 50, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "current", "A", "Operational Current limit value",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_thermostat": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0027, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x0027, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            0, 2, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            None, None, None, "Operational Thermostat",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_force_mode": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0028, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x0028, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            1, 3, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            None, None, None, "Operational Force mode",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+        "operational_air_removal": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0029, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x0029, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            1, 3, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            None, None, None, "Operational Air removal",
+# entity    17:manufacturer, 18:model
+            "aermec", "hmi080"),
+
     }   
 }
 
 RER020I_EFHR0_EVO_REGISTERS = {
-        #    0       1        2           3             4           5        6        7             8         9      10       11        12
-    # address, count, function, src_datatype, tgt_datatype, precision, scale state class, device class, unit, label, manufacturer, model
-    
-    # Discrete Output Coils –Read/Write (boolean, 1 bit)(funzione 01 read, funzione 15 write)
-
-    # Analog Input Registers –Read only (signed int, 16 bits)(funzione 04 read)
-    
-    # Analog Output Holding Registers -Read/Write (signed int, 16 bits)(funzione 03 read, funzione 16 write)
-        #    0       1        2           3             4           5        6        7             8         9      10       11        12
-    # address, count, function, src_datatype, tgt_datatype, precision, scale state class, device class, unit, label, manufacturer, model
-    "arw_set_temperatura_ambiente_in_celsius": (0x00, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, float, 1, 0.1, 15, 30, 0.1, CALL_TYPE_WRITE_REGISTERS, "measurement", "Temperature", "°C", "Temperature", "Eneren", "rer_020i"),
-    "arw_set_umidita_relativa_ambiente": (0x01, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, float, 1, 0.1, "measurement", "Humidity", "%", "Humidity", "Eneren", "rer_020i"),
-    "arw_set_ricambio": (0x02, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, float, 1, 1, "measurement", None, None, "Ricambio", "Eneren", "rer_020i"),
-    "arw_forzatura_valvola_acqua_modulante": (0x0A, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, float, 1, 1, "measurement", None, None, "Ricambio", "Eneren", "rer_020i"),
-    "arw_temperatura_minima_invernale_senza_riscaldamento": (0x0B, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, float, 1, 0.1, "measurement", "Temperature", "°C", "Ricambio", "Eneren", "rer_020i"),
-    "arw_temperatura_massima_estiva_senza_raffreddamento": (0x0C, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, float, 1, 0.1, "measurement", "Temperature", "°C", "Ricambio", "Eneren", "rer_020i"),
-    "arw_gestione_raffreddamento": (0x0D, 1, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16, float, 1, 1, "measurement", None, None, "Ricambio", "Eneren", "rer_020i"),
-
-    # Analog Input Registers –Read only (signed int, 16 bits)(funzione 04 read)
-    "ro_temperatura_ambiente": (0x00, 1, CALL_TYPE_REGISTER_INPUT, DataType.UINT16, float, 1, 0.1, "measurement", "Temperature", "°C", "Temperature", "Eneren", "rer_020i"),
-    "ro_umidita_relativa_ambiente": (0x01, 1, CALL_TYPE_REGISTER_INPUT, DataType.UINT16, float, 1, 0.1, "measurement", "Humidity", "%", "Humidity", "Eneren", "rer_020i"),
-    "ro_sonda_co2": (0x02, 1, CALL_TYPE_REGISTER_INPUT, DataType.UINT16, float, 1, 1, "measurement", "co2", "ppm", "co2", "Eneren", "rer_020i"),
-    "ro_temperatura_acqua": (0x10, 1, CALL_TYPE_REGISTER_INPUT, DataType.UINT16, float, 1, 0.1, "measurement", "Temperature", "°C", "Temperature", "Eneren", "rer_020i"),
-    "ro_temperatura_esterna": (0x11, 1, CALL_TYPE_REGISTER_INPUT, DataType.UINT16, float, 1, 0.1, "measurement", "Temperature", "°C", "Temperature", "Eneren", "rer_020i"),
-    "ro_stato_ventilatore_mandata": (0x12, 1, CALL_TYPE_REGISTER_INPUT, DataType.UINT16, float, 1, 1, "measurement", None, "%", "Stato ventilatore mandata", "Eneren", "rer_020i"),
-    "ro_stato_ventilatore_estrazione": (0x13, 1, CALL_TYPE_REGISTER_INPUT, DataType.UINT16, float, 1, 1, "measurement", None, "%", "Stato ventilatore mandata", "Eneren", "rer_020i"),
-    "ro_set_temperatura_effettivo": (0x14, 1, CALL_TYPE_REGISTER_INPUT, DataType.UINT16, float, 1, 0.1, "measurement", "Temperature", "°C", "Temperature", "Eneren", "rer_020i"),
-    "ro_set_umidita_effettivo": (0x15, 1, CALL_TYPE_REGISTER_INPUT, DataType.UINT16, float, 1, 0.1, "measurement", "Humidity", "%", "Humidity", "Eneren", "rer_020i"),
-    "ro_set_ricambio_effettivo": (0x16, 1, CALL_TYPE_REGISTER_INPUT, DataType.UINT16, float, 1, 1, "measurement", None, None, "Ricambio", "Eneren", "rer_020i"),
-    "ro_temperatura_mandata_aria": (0x19, 1, CALL_TYPE_REGISTER_INPUT, DataType.UINT16, float, 1, 0.1, "measurement", "Temperature", "°C", "Temperature", "Eneren", "rer_020i"),
-
+    Platform.BINARY_SENSOR : {
+        "ro_presenza_allarme": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x00, 1, CALL_TYPE_DISCRETE, DataType.UINT16, 0, 1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+            None, None, None, "Presenza allarme",
+# entity    10:manufacturer, 11:model
+            "eneren", "rer_020i"),    
+        "ro_presenza_avvertimento": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x01, 1, CALL_TYPE_DISCRETE, DataType.UINT16, 0, 1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+            None, None, None, "Presenza avvertimento",
+# entity    10:manufacturer, 11:model
+            "eneren", "rer_020i"),    
+        "ro_filtri_da_pulire": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x02, 1, CALL_TYPE_DISCRETE, DataType.UINT16, 0, 1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+            None, None, None, "Filtri da pulire",
+# entity    10:manufacturer, 11:model
+            "eneren", "rer_020i"),    
+        "ro_presenza_free_cooling": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x09, 1, CALL_TYPE_DISCRETE, DataType.UINT16, 0, 1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+            None, None, None, "Presenza free-cooling",
+# entity    10:manufacturer, 11:model
+            "eneren", "rer_020i"),    
+        "ro_allarme_alta_pressione": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0C, 1, CALL_TYPE_DISCRETE, DataType.UINT16, 0, 1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+            None, None, None, "Allarme alta pressione",
+# entity    10:manufacturer, 11:model
+            "eneren", "rer_020i"),    
+        "ro_avvertimento_bassa_temperatura_acqua_per_on_compressore": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0D, 1, CALL_TYPE_DISCRETE, DataType.UINT16, 0, 1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+            None, None, None, "Avvertimento bassa temperatura acqua per ON compressore",
+# entity    10:manufacturer, 11:model
+            "eneren", "rer_020i"),    
+        "ro_avvertimento_alta_temperatura_acqua_per_on_compressore": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0E, 1, CALL_TYPE_DISCRETE, DataType.UINT16, 0, 1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+            None, None, None, "Avvertimento alta temperatura acqua per ON compressore",
+# entity    10:manufacturer, 11:model
+            "eneren", "rer_020i"),    
+        "ro_allarme_dew_point": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x10, 1, CALL_TYPE_DISCRETE, DataType.UINT16, 0, 1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+            None, None, None, "Allarme dew-point",
+# entity    10:manufacturer, 11:model
+            "eneren", "rer_020i"),    
+        "ro_stato_compressore": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x11, 1, CALL_TYPE_DISCRETE, DataType.UINT16, 0, 1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+            None, None, None, "Stato compressore",
+# entity    10:manufacturer, 11:model
+            "eneren", "rer_020i"),    
+        "ro_stato_free_cooling": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x12, 1, CALL_TYPE_DISCRETE, DataType.UINT16, 0, 1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+            None, None, None, "Stato free-cooling",
+# entity    10:manufacturer, 11:model
+            "eneren", "rer_020i"),    
+        "ro_richiesta_acqua_da_impianto": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x13, 1, CALL_TYPE_DISCRETE, DataType.UINT16, 0, 1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+            None, None, None, "Richiesta acqua da impianto",
+# entity    10:manufacturer, 11:model
+            "eneren", "rer_020i"),    
+        "ro_richiesta_deumidifica": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x14, 1, CALL_TYPE_DISCRETE, DataType.UINT16, 0, 1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+            None, None, None, "Richiesta deumidifica",
+# entity    10:manufacturer, 11:model
+            "eneren", "rer_020i"),    
+        "ro_richiesta_raffreddamento": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x15, 1, CALL_TYPE_DISCRETE, DataType.UINT16, 0, 1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+            None, None, None, "Richiesta raffreddamento",
+# entity    10:manufacturer, 11:model
+            "eneren", "rer_020i"),    
+        "ro_richiesta_riscaldamento": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x16, 1, CALL_TYPE_DISCRETE, DataType.UINT16, 0, 1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+            None, None, None, "Richiesta riscaldamento",
+# entity    10:manufacturer, 11:model
+            "eneren", "rer_020i"),    
+        "ro_presenza_sonda_t_mandata_aria": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x17, 1, CALL_TYPE_DISCRETE, DataType.UINT16, 0, 1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+            None, None, None, "Presenza sonda T mandata aria",
+# entity    10:manufacturer, 11:model
+            "eneren", "rer_020i"),    
+        "ro_controllo_temperatura_di_mandata_onoff_attivo": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x18, 1, CALL_TYPE_DISCRETE, DataType.UINT16, 0, 1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+            None, None, None, "Controllo temperatura di mandata on/off attivo",
+# entity    10:manufacturer, 11:model
+            "eneren", "rer_020i"),    
+        "ro_controllo_temperatura_di_mandata_onoff_attivo": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x19, 1, CALL_TYPE_DISCRETE, DataType.UINT16, 0, 1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+            None, None, None, "Controllo temperatura di mandata on/off attivo",
+# entity    10:manufacturer, 11:model
+            "eneren", "rer_020i"),    
+        "ro_presenza_funzione_controllo_di_temperatura_di_mandata_modulante": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x1A, 1, CALL_TYPE_DISCRETE, DataType.UINT16, 0, 1,
+# entity    6:state_class, 7:device_class, 8:unit_of_measurement, 9:default_label
+            None, None, None, "Presenza funzione controllo di temperatura di mandata modulante",
+# entity    10:manufacturer, 11:model
+            "eneren", "rer_020i"),    
+    },
     Platform.SENSOR : {
         "ro_temperatura_ambiente": (
 # read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
@@ -518,13 +1108,130 @@ RER020I_EFHR0_EVO_REGISTERS = {
     Platform.SWITCH : {
         "device_power_control": (
 # read      0:address, 1:function, 2:open, 3:close 
-            0x00, CALL_TYPE_COIL, 0x00, 0x01,
+            0x00, CALL_TYPE_COIL, 0x01, 0x00,
 # write     4:address, 5:function, 6:open, 7:close
-            0x00, CALL_TYPE_WRITE_COILS, 0x00, 0x01,
+            0x00, CALL_TYPE_WRITE_COILS, 0x01, 0x00,
 # entity    8:default_label
             "Device Power",
 # entity    9:manufacturer, 10:model            
             "eneren", "rer_020i"), 
+    },
+    Platform.NUMBER : {
+        "operational_mode": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x01, 1, CALL_TYPE_COIL, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x01, CALL_TYPE_WRITE_COILS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            0, 1, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            None, None, None, "Operational mode",
+# entity    17:manufacturer, 18:model
+            "eneren", "rer_020i"),
+
+        "set_temperatura_ambiente_in_celsius": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x00, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 1, 0.1,
+# write     6:address, 7:function, 8:scale
+            0x00, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            15, 30, 0.5, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Set temperatura ambiente in celsius",
+# entity    17:manufacturer, 18:model
+            "eneren", "rer_020i"),
+        "set_umidità_relativa_ambiente": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x01, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 1, 0.1,
+# write     6:address, 7:function, 8:scale
+            0x01, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            40, 90, 0.5, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "humidity", "%", "Set umidità relativa ambiente",
+# entity    17:manufacturer, 18:model
+            "eneren", "rer_020i"),
+        "set_ricambio": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x02, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x02, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            0, 5, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            None, None, None, "Set ricambio",
+# entity    17:manufacturer, 18:model
+            "eneren", "rer_020i"),
+        "temperatura_minima_invernale_senza_riscaldamento": (
+#           Se l’aria di mandata èa una temperatura inferiore al valore impostato, la macchina attiverà la richiesta acqua
+#           così da mitigare e non immettere aria troppo fredda.[se non presente controllo di temperatura di mandata modulante]
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0B, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 1, 0.1,
+# write     6:address, 7:function, 8:scale
+            0x0B, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            0, 90, 0.5, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Temperatura minima invernale senza riscaldamento",
+# entity    17:manufacturer, 18:model
+            "eneren", "rer_020i"),
+        "temperatura_massima_estiva_senza_raffreddamento": (
+#           Se l’aria di mandata è a una temperatura superiore al valore impostato, la macchina attiverà la richiesta
+#           acqua così da mitigare e non immettere aria troppo calda.[se non presente controllo di temperatura di mandata modulante]
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0C, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 1, 0.1,
+# write     6:address, 7:function, 8:scale
+            0x0C, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            0, 90, 0.5, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Temperatura massima estiva senza raffreddamento",
+# entity    17:manufacturer, 18:model
+            "eneren", "rer_020i"),
+        "gestione_raffreddamento": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0D, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x0D, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            0, 2, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            None, None, None, "Gestione raffreddamento",
+# entity    17:manufacturer, 18:model
+            "eneren", "rer_020i"),
+        "protezione_dewpoint_differenziale": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0E, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 1, 0.1,
+# write     6:address, 7:function, 8:scale
+            0x0E, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            -10, 10, 0.5, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Protezione dew-point, differenziale",
+# entity    17:manufacturer, 18:model
+            "eneren", "rer_020i"),
+        "protezione_dewpoint_valore_t_dewpoint": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x0F, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 1, 0.1,
+# write     6:address, 7:function, 8:scale
+            0x0F, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            10, 40, 0.5, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            "measurement", "temperature", "°C", "Protezione dew-point, valore T dew-point",
+# entity    17:manufacturer, 18:model
+            "eneren", "rer_020i"),
+        "richiesta_attivazione_compressore": (
+# read      0:address, 1:quantity, 2:function, 3:data_type, 4:precision, 5:scale 
+            0x13, 1, CALL_TYPE_REGISTER_HOLDING, DataType.INT16, 0, 1,
+# write     6:address, 7:function, 8:scale
+            0x13, CALL_TYPE_WRITE_REGISTERS, 1,
+# number    9:min, 10:max, 11:step, 12:mode (auto, box, slider)
+            0, 2, 1, "box",
+# entity    13:state_class, 14:device_class, 15:unit_of_measurement, 16:default_label
+            None, None, None, "Richiesta attivazione compressore",
+# entity    17:manufacturer, 18:model
+            "eneren", "rer_020i"),
     }
 }
 

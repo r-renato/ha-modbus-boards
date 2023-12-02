@@ -103,6 +103,7 @@ class ModbusRegisterSensor(BaseStructPlatform, RestoreSensor, SensorEntity):
         if slave_count:
             self._count = self._count * (slave_count + 1)
         self._coordinator: DataUpdateCoordinator[list[int] | None] | None = None
+        
         if CONF_SCAN_INTERVAL in internal_sensors:
             self._scan_interval = int(internal_sensors[CONF_SCAN_INTERVAL])
         self._attr_native_unit_of_measurement = entry.get(CONF_UNIT_OF_MEASUREMENT)

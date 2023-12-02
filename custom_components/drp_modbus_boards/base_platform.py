@@ -342,6 +342,7 @@ class BaseSwitch(BasePlatform, ToggleEntity, RestoreEntity):
                 self._attr_is_on = True
             elif state.state == STATE_OFF:
                 self._attr_is_on = False
+        await self._async_update()
 
     async def async_turn(self, command: int) -> None:
         """Evaluate switch result."""
@@ -386,7 +387,7 @@ class BaseSwitch(BasePlatform, ToggleEntity, RestoreEntity):
             channel = (address & 0xff00) >> 8
             address = address & 0x00ff
 
-        _LOGGER.debug( '### async_update switch slave:%d, address:%d, channell:%d, write_type:%s', 
+        _LOGGER.debug( '### async_update switch slave:%d, address:%d, channell:%d, verify_type:%s', 
              self._slave, address, channel, str(self._verify_type) )
         
         # remark "now" is a dummy parameter to avoid problems with
