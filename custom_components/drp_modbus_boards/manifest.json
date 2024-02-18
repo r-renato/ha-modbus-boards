@@ -1,0 +1,13 @@
+{
+    "domain": "drp_modbus_boards",
+    "name": "DRP (Domotic Residential Platform) Modbus Boards",
+    "documentation": "https://github.com/r-renato/ha-modbus-boards",
+    "iot_class": "local_polling",
+    "loggers": ["pymodbus"],
+    "quality_scale": "gold",
+    "requirements": ["pymodbus==3.6.3"],
+    "dependencies": [],
+    "codeowners": ["@"],
+    "config_flow": true,
+    "version": "1.0.0"
+  }

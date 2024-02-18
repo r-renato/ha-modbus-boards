@@ -109,6 +109,9 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+archive/
+backup/
+2024.1.2/
 
 # Spyder project settings
 .spyderproject

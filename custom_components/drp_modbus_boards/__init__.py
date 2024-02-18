@@ -29,7 +29,6 @@ from homeassistant.const import (
     CONF_COVERS,
     CONF_DELAY,
     CONF_DEVICE_CLASS,
-    CONF_FRIENDLY_NAME,
     CONF_HOST,
     CONF_LIGHTS,
     CONF_METHOD,
@@ -46,14 +45,13 @@ from homeassistant.const import (
     CONF_TYPE,
     CONF_UNIQUE_ID,
     CONF_UNIT_OF_MEASUREMENT,
+)
+from homeassistant.const import (
+    CONF_FRIENDLY_NAME,
     CONF_ICON,
     CONF_MODE,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.components.input_number import (
-    InputNumber,
-    _cv_input_number,
-)
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 
@@ -70,6 +68,18 @@ from .const import (  # noqa: F401
     CONF_CLOSE_COMM_ON_ERROR,
     CONF_DATA_TYPE,
     CONF_DEVICE_ADDRESS,
+    CONF_FAN_MODE_AUTO,
+    CONF_FAN_MODE_DIFFUSE,
+    CONF_FAN_MODE_FOCUS,
+    CONF_FAN_MODE_HIGH,
+    CONF_FAN_MODE_LOW,
+    CONF_FAN_MODE_MEDIUM,
+    CONF_FAN_MODE_MIDDLE,
+    CONF_FAN_MODE_OFF,
+    CONF_FAN_MODE_ON,
+    CONF_FAN_MODE_REGISTER,
+    CONF_FAN_MODE_TOP,
+    CONF_FAN_MODE_VALUES,
     CONF_FANS,
     CONF_HVAC_MODE_AUTO,
     CONF_HVAC_MODE_COOL,
@@ -81,7 +91,6 @@ from .const import (  # noqa: F401
     CONF_HVAC_MODE_REGISTER,
     CONF_HVAC_MODE_VALUES,
     CONF_HVAC_ONOFF_REGISTER,
-    CONF_NUMBERS,
     CONF_INPUT_TYPE,
     CONF_LAZY_ERROR,
     CONF_MAX_TEMP,
@@ -94,7 +103,6 @@ from .const import (  # noqa: F401
     CONF_PRECISION,
     CONF_RETRIES,
     CONF_RETRY_ON_EMPTY,
-    CONF_REVERSE,
     CONF_SCALE,
     CONF_SLAVE_COUNT,
     CONF_STATE_CLOSED,
@@ -109,7 +117,6 @@ from .const import (  # noqa: F401
     CONF_STOPBITS,
     CONF_SWAP,
     CONF_SWAP_BYTE,
-    CONF_SWAP_NONE,
     CONF_SWAP_WORD,
     CONF_SWAP_WORD_BYTE,
     CONF_TARGET_TEMP,
@@ -119,8 +126,8 @@ from .const import (  # noqa: F401
     CONF_WRITE_REGISTERS,
     CONF_WRITE_TYPE,
     CONF_ZERO_SUPPRESS,
-    CONF_INITIAL,
     DEFAULT_HUB,
+    DEFAULT_STRUCTURE_PREFIX,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_TEMP_UNIT,
     MODBUS_DOMAIN as DOMAIN,
@@ -129,16 +136,23 @@ from .const import (  # noqa: F401
     TCP,
     UDP,
     DataType,
-
+)
+from .boards_const import (
+    CONF_BOARD,
+    CONF_NUMBERS,
+    CONF_REVERSE,
+    CONF_SWITCH_CONSTRAINT,
+    DEFAULT_SCAN_INTERVAL,
+    MODBUS_DOMAIN as DOMAIN,
     MODE_SLIDER,
     MODE_BOX,
-    CONF_BOARD,
-    CONF_SWITCH_CONSTRAINT,
     Board,
 )
+
 from .modbus import ModbusHub, async_modbus_setup
 from .validators import (
     duplicate_entity_validator,
+    duplicate_fan_mode_validator,
     duplicate_modbus_validator,
     nan_validator,
     number_validator,
@@ -156,6 +170,7 @@ BASE_COMPONENT_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_NAME): cv.string,
         # vol.Required(CONF_ADDRESS): cv.positive_int,
+
         vol.Required(CONF_BOARD): vol.In(
             [
                 Board.AERMEC_HMI080,
@@ -166,17 +181,18 @@ BASE_COMPONENT_SCHEMA = vol.Schema(
                 Board.ELETECHSUP_NT18B07,
                 Board.ELETECHSUP_R4D3B16,
                 Board.WAVESHARE_RTU_RELAY,
+                Board.XY_MOD01_SHT20,
+                Board.GL_TH02_PE,
             ]
         ),
 
         vol.Optional(CONF_SWITCH_CONSTRAINT): cv.string,
-
         vol.Exclusive(CONF_DEVICE_ADDRESS, "slave_addr"): cv.positive_int,
         vol.Exclusive(CONF_SLAVE, "slave_addr"): cv.positive_int,
         vol.Optional(
             CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL
         ): cv.positive_int,
-        vol.Optional(CONF_LAZY_ERROR, default=0): cv.positive_int,
+        vol.Optional(CONF_LAZY_ERROR): cv.positive_int,
         vol.Optional(CONF_UNIQUE_ID): cv.string,
     }
 )
@@ -190,14 +206,12 @@ BASE_STRUCT_SCHEMA = BASE_COMPONENT_SCHEMA.extend(
                 CALL_TYPE_REGISTER_INPUT,
             ]
         ),
-        vol.Optional(CONF_COUNT): cv.positive_int,
+        vol.Optional(CONF_COUNT, default=0): cv.positive_int,
         vol.Optional(CONF_DATA_TYPE, default=DataType.INT16): vol.In(
             [
-                DataType.INT8,
                 DataType.INT16,
                 DataType.INT32,
                 DataType.INT64,
-                DataType.UINT8,
                 DataType.UINT16,
                 DataType.UINT32,
                 DataType.UINT64,
@@ -208,13 +222,15 @@ BASE_STRUCT_SCHEMA = BASE_COMPONENT_SCHEMA.extend(
                 DataType.CUSTOM,
             ]
         ),
-        vol.Optional(CONF_STRUCTURE): cv.string,
+        vol.Optional(CONF_STRUCTURE, default=DEFAULT_STRUCTURE_PREFIX): cv.string,
         vol.Optional(CONF_SCALE, default=1): number_validator,
         vol.Optional(CONF_OFFSET, default=0): number_validator,
-        vol.Optional(CONF_PRECISION, default=0): cv.positive_int,
-        vol.Optional(CONF_SWAP, default=CONF_SWAP_NONE): vol.In(
-            [
-                CONF_SWAP_NONE,
+        vol.Optional(CONF_PRECISION): cv.positive_int,
+        vol.Optional(
+            CONF_SWAP, default="none"
+        ): vol.In(
+            [   
+                "none",
                 CONF_SWAP_BYTE,
                 CONF_SWAP_WORD,
                 CONF_SWAP_WORD_BYTE,
@@ -263,8 +279,8 @@ CLIMATE_SCHEMA = vol.All(
         {
             vol.Required(CONF_TARGET_TEMP): cv.positive_int,
             vol.Optional(CONF_TARGET_TEMP_WRITE_REGISTERS, default=False): cv.boolean,
-            vol.Optional(CONF_MAX_TEMP, default=35): cv.positive_int,
-            vol.Optional(CONF_MIN_TEMP, default=5): cv.positive_int,
+            vol.Optional(CONF_MAX_TEMP, default=35): number_validator,
+            vol.Optional(CONF_MIN_TEMP, default=5): number_validator,
             vol.Optional(CONF_STEP, default=0.5): vol.Coerce(float),
             vol.Optional(CONF_TEMPERATURE_UNIT, default=DEFAULT_TEMP_UNIT): cv.string,
             vol.Optional(CONF_HVAC_ONOFF_REGISTER): cv.positive_int,
@@ -298,19 +314,32 @@ CLIMATE_SCHEMA = vol.All(
                     vol.Optional(CONF_WRITE_REGISTERS, default=False): cv.boolean,
                 }
             ),
+            vol.Optional(CONF_FAN_MODE_REGISTER): vol.Maybe(
+                vol.All(
+                    {
+                        CONF_ADDRESS: cv.positive_int,
+                        CONF_FAN_MODE_VALUES: {
+                            vol.Optional(CONF_FAN_MODE_ON): cv.positive_int,
+                            vol.Optional(CONF_FAN_MODE_OFF): cv.positive_int,
+                            vol.Optional(CONF_FAN_MODE_AUTO): cv.positive_int,
+                            vol.Optional(CONF_FAN_MODE_LOW): cv.positive_int,
+                            vol.Optional(CONF_FAN_MODE_MEDIUM): cv.positive_int,
+                            vol.Optional(CONF_FAN_MODE_HIGH): cv.positive_int,
+                            vol.Optional(CONF_FAN_MODE_TOP): cv.positive_int,
+                            vol.Optional(CONF_FAN_MODE_MIDDLE): cv.positive_int,
+                            vol.Optional(CONF_FAN_MODE_FOCUS): cv.positive_int,
+                            vol.Optional(CONF_FAN_MODE_DIFFUSE): cv.positive_int,
+                        },
+                    },
+                    duplicate_fan_mode_validator,
+                ),
+            ),
         }
     ),
 )
 
 COVERS_SCHEMA = BASE_COMPONENT_SCHEMA.extend(
     {
-        vol.Required(CONF_COVERS): vol.All(
-            cv.ensure_list, [vol.Schema({
-                                vol.Required(CONF_NAME): cv.string,
-                                vol.Optional(CONF_FRIENDLY_NAME): cv.string,
-                                vol.Optional(CONF_UNIQUE_ID): cv.string
-                            })]
-        ),
         vol.Optional(
             CONF_INPUT_TYPE,
             default=CALL_TYPE_REGISTER_HOLDING,
@@ -338,7 +367,7 @@ SWITCH_SCHEMA = BASE_SWITCH_SCHEMA.extend(
         vol.Required(CONF_SWITCHES): vol.All(
                 cv.ensure_list, [vol.Schema({
                                     vol.Required(CONF_NAME): cv.string,
-                                    vol.Optional(CONF_FRIENDLY_NAME): cv.string,
+                                    vol.Required(CONF_FRIENDLY_NAME): cv.string,
                                     vol.Optional(CONF_UNIQUE_ID): cv.string,
                                     vol.Optional(CONF_REVERSE, default=False): cv.boolean,
                                 })]
@@ -391,13 +420,12 @@ SENSOR_SCHEMA = vol.All(
                                     vol.Optional(CONF_UNIQUE_ID): cv.string,
                                     vol.Optional(CONF_SCAN_INTERVAL): cv.positive_int,
                                 })]
-            ),
+            ),            
             vol.Optional(CONF_DEVICE_CLASS): SENSOR_DEVICE_CLASSES_SCHEMA,
             vol.Optional(CONF_STATE_CLASS): SENSOR_STATE_CLASSES_SCHEMA,
             vol.Optional(CONF_UNIT_OF_MEASUREMENT): cv.string,
             vol.Exclusive(CONF_VIRTUAL_COUNT, "vir_sen_count"): cv.positive_int,
             vol.Exclusive(CONF_SLAVE_COUNT, "vir_sen_count"): cv.positive_int,
-            
             vol.Optional(CONF_MIN_VALUE): number_validator,
             vol.Optional(CONF_MAX_VALUE): number_validator,
             vol.Optional(CONF_NAN_VALUE): nan_validator,
@@ -433,10 +461,10 @@ BINARY_SENSOR_SCHEMA = BASE_COMPONENT_SCHEMA.extend(
 MODBUS_SCHEMA = vol.Schema(
     {
         vol.Optional(CONF_NAME, default=DEFAULT_HUB): cv.string,
-        vol.Optional(CONF_TIMEOUT, default=3): cv.socket_timeout,
+        vol.Optional(CONF_TIMEOUT, default=5): cv.socket_timeout,
         vol.Optional(CONF_CLOSE_COMM_ON_ERROR): cv.boolean,
         vol.Optional(CONF_DELAY, default=0): cv.positive_int,
-        vol.Optional(CONF_RETRIES, default=3): cv.positive_int,
+        vol.Optional(CONF_RETRIES): cv.positive_int,
         vol.Optional(CONF_RETRY_ON_EMPTY): cv.boolean,
         vol.Optional(CONF_MSG_WAIT): cv.positive_int,
         vol.Optional(CONF_BINARY_SENSORS): vol.All(
@@ -453,7 +481,6 @@ MODBUS_SCHEMA = vol.Schema(
         ),
         vol.Optional(CONF_SWITCHES): vol.All(cv.ensure_list, [SWITCH_SCHEMA]),
         vol.Optional(CONF_FANS): vol.All(cv.ensure_list, [FAN_SCHEMA]),
-
         vol.Optional(CONF_NUMBERS): vol.All(cv.ensure_list, [NUMBER_SCHEMA]),
     }
 )

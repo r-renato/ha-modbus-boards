@@ -1,0 +1,102 @@
+"""Base implementation for all modbus platforms."""
+from __future__ import annotations
+
+from abc import abstractmethod
+from collections.abc import Callable
+from datetime import datetime, timedelta
+import logging
+import struct
+from typing import Any
+
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.event import async_call_later
+from homeassistant.const import (
+    Platform,
+)
+from .boards_const import (
+    CONF_BOARD,
+    BOARD_SENSORS,
+    ADDRESS,
+    QUANTITY,
+    FUNCTION,
+    BoardBlock,
+)
+from .modbus import ModbusHub
+from .base_platform import BasePlatform, BaseStructPlatform
+
+PARALLEL_UPDATES = 1
+
+_LOGGER = logging.getLogger(__name__)
+
+class BoardsBasePlatform(BasePlatform):
+    """Base for readonly platforms."""
+
+    def __init__(
+        self, hass: HomeAssistant, hub: ModbusHub, entry: dict[str, Any]
+    ) -> None:
+        """Initialize the Modbus binary sensor."""
+        super().__init__(hass, hub, entry)
+        self._state_constraint = 'on'
+
+    async def _async_component_changed(self, event):
+        """Handle sensor changes."""
+        new_state = event.data.get("new_state")
+        self._state_constraint = new_state.state
+
+        if self._state_constraint == 'on':
+            self._attr_available = True
+            self.async_write_ha_state()
+            async_call_later(self.hass, 7, self.async_update)
+        else:
+            self._attr_available = False
+            self.async_write_ha_state()
+
+        _LOGGER.debug( 'async_component_changed: slave:%d, constraint:%s', self._slave, str(self._state_constraint) )
+
+
+class BoardsBaseStructPlatform(BaseStructPlatform):
+    """Base class representing a sensor/climate."""
+
+    def __init__(self, hass: HomeAssistant, hub: ModbusHub, config: dict) -> None:
+        """Initialize the switch."""
+        super().__init__(hass, hub, config)
+
+        self._attr_board = config.get(CONF_BOARD)
+        self._attr_board_blocks = {}
+
+    def _process_raw_value(
+        self, entry: float | int | str | bytes
+    ) -> float | int | str | bytes | None:
+        """Process value from sensor with NaN handling, scaling, offset, min/max etc."""
+        if self._nan_value and entry in (self._nan_value, -self._nan_value):
+            return None
+        if isinstance(entry, bytes):
+            return entry
+        val: float | int = self._scale * entry + self._offset
+        if self._min_value is not None and val < self._min_value:
+            return self._min_value
+        if self._max_value is not None and val > self._max_value:
+            return self._max_value
+        if self._zero_suppress is not None and abs(val) <= self._zero_suppress:
+            return 0
+        return val
+
+    async def async_board_read_data(self, board: str, platform: str):
+
+        REGISTERS = (BOARD_SENSORS[board])[platform]
+
+        for block in BoardBlock:
+            if block in REGISTERS:
+                block_register = REGISTERS[block]
+                self._cancel_call = None
+                raw_result = await self._hub.async_pb_call(
+                    self._slave, block_register[ADDRESS], block_register[QUANTITY], block_register[FUNCTION]
+                )
+
+
+
+
+
+
+
+

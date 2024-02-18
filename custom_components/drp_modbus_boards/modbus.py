@@ -8,11 +8,12 @@ from collections.abc import Callable
 import logging
 from typing import Any
 
+from pymodbus.client.base import ModbusBaseClient
 from pymodbus.client import (
-    ModbusBaseClient,
     ModbusSerialClient,
     ModbusTcpClient,
     ModbusUdpClient,
+    AsyncModbusTcpClient,
 )
 from pymodbus.exceptions import ModbusException
 from pymodbus.pdu import ModbusResponse
@@ -63,7 +64,7 @@ from .const import (
     CONF_STOPBITS,
     DEFAULT_HUB,
     MODBUS_DOMAIN as DOMAIN,
-    PLATFORMS,
+    # PLATFORMS,
     RTUOVERTCP,
     SERIAL,
     SERVICE_RESTART,
@@ -75,7 +76,10 @@ from .const import (
     TCP,
     UDP,
 )
-
+from .boards_const import (
+    MODBUS_DOMAIN as DOMAIN,
+    PLATFORMS,
+)
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -264,6 +268,26 @@ class ModbusHub:
     def __init__(self, hass: HomeAssistant, client_config: dict[str, Any]) -> None:
         """Initialize the Modbus hub."""
 
+        if CONF_RETRIES in client_config:
+            async_create_issue(
+                hass,
+                DOMAIN,
+                "deprecated_retries",
+                breaks_in_ha_version="2024.7.0",
+                is_fixable=False,
+                severity=IssueSeverity.WARNING,
+                translation_key="deprecated_retries",
+                translation_placeholders={
+                    "config_key": "retries",
+                    "integration": DOMAIN,
+                    "url": "https://www.home-assistant.io/integrations/modbus",
+                },
+            )
+            _LOGGER.warning(
+                "`retries`: is deprecated and will be removed in version 2024.7"
+            )
+        else:
+            client_config[CONF_RETRIES] = 3 
         if CONF_CLOSE_COMM_ON_ERROR in client_config:
             async_create_issue(
                 hass,
@@ -319,7 +343,7 @@ class ModbusHub:
         self._pb_params = {
             "port": client_config[CONF_PORT],
             "timeout": client_config[CONF_TIMEOUT],
-            "retries": client_config[CONF_RETRIES],
+            "retries": client_config.get(CONF_RETRIES, 3),
             "retry_on_empty": True,
         }
         if self._config_type == SERIAL:
@@ -350,6 +374,8 @@ class ModbusHub:
             self._msg_wait = 30 / 1000
         else:
             self._msg_wait = 0
+
+        _LOGGER.debug('__init__ %s %s', self.name, str(self._pb_params))
 
     def _log_error(self, text: str, error_state: bool = True) -> None:
         log_text = f"Pymodbus: {self.name}: {text}"
@@ -430,40 +456,40 @@ class ModbusHub:
         message = f"modbus {self.name} communication open"
         _LOGGER.info(message)
         return True
-
+    
     def pb_call(
         self, slave: int | None, address: int, value: int | list[int], use_call: str
     ) -> ModbusResponse | None:
         """Call sync. pymodbus."""
-        start_time = time.perf_counter()
         kwargs = {"slave": slave} if slave else {}
-        _LOGGER.debug( '$$ pb_call start IO slave:%s, address:%s, value:%s, operation:%s', 
-                str(slave), str(address), str(value), str(use_call) )
         entry = self._pb_request[use_call]
+
         try:
+            start_time = time.perf_counter()
             result: ModbusResponse = entry.func(address, value, **kwargs)
         except ModbusException as exception_error:
-            _LOGGER.debug( '>> slave:%d, address:%d, count:%d, operation:%s', 
-                slave, address, value, use_call )
-            self._log_error(str(exception_error))
+            end_time = time.perf_counter()
+            self._log_error(f"pb_call ({round(end_time-start_time, 2)}) slave:{slave}, address:{address}, value:{value}, method:{use_call} @| " + str(exception_error))
             return None
+        end_time = time.perf_counter()
         if not result:
-            self._log_error("Error: pymodbus returned None")
+            self._log_error(f"pb_call ({round(end_time-start_time, 2)}) slave:{slave}, address:{address}, value:{value}, method:{use_call} | Error: pymodbus returned None")
             return None
         if not hasattr(result, entry.attr):
-            self._log_error(str(result))
+            _LOGGER.debug(f"pb_call ({round(end_time-start_time, 2)}) slave:{slave}, address:{address}, value:{value}, method:{use_call} #| " + str(result) + " " + str(entry))
+            # self._log_error(str(result))
             return None
         if result.isError():
-            self._log_error("Error: pymodbus returned isError True")
+            self._log_error(f"pb_call ({round(end_time-start_time, 2)}) slave:{slave}, address:{address}, value:{value}, method:{use_call} | Error: pymodbus returned isError True")
             return None
         self._in_error = False
         
-        _LOGGER.debug( '$$ pb_call start IO slave:%s, address:%s, value:%s, operation:%s, seconds:%s, registers :: %s, bits :: %s', 
-                str(slave), str(address), str(value), str(use_call), str(round(time.perf_counter()-start_time, 2)), 
+        _LOGGER.debug( 'pb_call (%s) slave:%s, addr:%s, qty:%s, fn:%s, registers :: %s, bits :: %s', 
+                str(round(end_time-start_time, 2)), str(slave), str(address), str(value), str(use_call),  
                 str(result.registers), str(result.bits))
         
         return result
-
+            
     async def async_pb_call(
         self,
         unit: int | None,
@@ -473,8 +499,6 @@ class ModbusHub:
     ) -> ModbusResponse | None:
         """Convert async to sync pymodbus call."""
         start_time = time.perf_counter()
-        _LOGGER.debug( '### async_pb_call 1 slave:%d, address:%d, value:%s, operation:%s, waiters:%s', 
-                    unit, address, str(value), str(use_call), str(self._lock)  )
         if self._config_delay:
             return None
         # _LOGGER.debug( "### async_pb_call 2 slave:%d ::: %s %s %s", unit, str(self._lock), str(self._client), str(self._msg_wait))
@@ -484,9 +508,12 @@ class ModbusHub:
             result = await self.hass.async_add_executor_job(
                 self.pb_call, unit, address, value, use_call
             )
-            _LOGGER.debug( '### async_pb_call 2 slave:%d, address:%d, value:%s, operation:%s, waiters:%s, seconds:%s, result:%s', 
-                unit, address, str(value), str(use_call), str(self._lock), 
-                str(round(time.perf_counter()-start_time, 2)), str(result)  ) 
+
+            _LOGGER.debug( 'async_pb_call (%s) slave:%d, addr:%d, qty:%s, fn:%s,  res:%s,registers:%s, bits: %s', 
+                str(round(time.perf_counter()-start_time, 2)), unit, address, str(value), str(use_call), 
+                str(result), str(result.registers if result else None), str(result.bits if result else None),
+            )
+            
             if self._msg_wait:
                 # small delay until next request/response
                 await asyncio.sleep(self._msg_wait)
