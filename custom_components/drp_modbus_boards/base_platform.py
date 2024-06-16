@@ -217,13 +217,13 @@ class DataProcessing:
         elif _data_type in (DataType.INT32, DataType.UINT32, DataType.FLOAT32):
             posix = (ndx_start, ndx_start + 1)
 
-        _LOGGER.debug( "unpack_data '%s' '%s' %s",
-            str(registers), str(_data_type), str(posix)
-        )
+        # _LOGGER.debug( "unpack_data '%s' '%s' %s",
+        #     str(registers), str(_data_type), str(posix)
+        # )
         subset_data = [registers[i] for i in posix]
-        _LOGGER.debug( "unpack_data reg:'%s' dtype:'%s' ndx:%s, subset:'%s'",
-            str(registers), str(_data_type), str(posix), str(subset_data)
-        )
+        # _LOGGER.debug( "unpack_data reg:'%s' dtype:'%s' ndx:%s, subset:'%s'",
+        #     str(registers), str(_data_type), str(posix), str(subset_data)
+        # )
         result_list = DataProcessing._unpack_structure_result(subset_data,_data_type,_scale,_precision)
 
         return result_list
@@ -424,6 +424,11 @@ class BoardsBasePlatform(BasePlatform):
  
                 done = True if raw_result else False
 
+                _LOGGER.debug( "async_board_read_data %s %s %s %s %s %s",
+                                                  self._slave, 
+                    block_register[BoardBlockRegIdx.BLOCK_ADDRESS], 
+                    block_register[BoardBlockRegIdx.BLOCK_QTY], 
+                    block_register[BoardBlockRegIdx.BLOCK_FUNCTION], str(raw_result))
                 _LOGGER.debug( "async_board_read_data %s %s slave:%s addr:%s qty:%s fn:%s res:%s", 
                             self._attr_board, platform, 
                             str(self._slave), str(block_register[BoardBlockRegIdx.BLOCK_ADDRESS]),
@@ -800,6 +805,8 @@ class BoardsBaseSwitch(BaseSwitch):
 
     async def async_turn(self, command: int) -> None:
         if self._command_lock_flag and (time.perf_counter()-self._command_start_time < 60):
+            # _LOGGER.debug( "async_turn (%d) '%s' slave:'%s' block for time", 
+            #         round(time.perf_counter()-self._command_start_time, 2), self._attr_board, self._slave)
             return
 
         if self._state_constraint != 'on':
@@ -808,6 +815,7 @@ class BoardsBaseSwitch(BaseSwitch):
             if self._coordinator:
                 self._coordinator.async_set_updated_data(None)
             self.async_write_ha_state()
+            # _LOGGER.debug( "async_turn (1)" )
             return  
         
         async with self._command_lock:
@@ -827,11 +835,12 @@ class BoardsBaseSwitch(BaseSwitch):
                         (self._async_turn_on if command == self.command_on else self._async_turn_off)
                     )
                     self._update_lock_flag = False
+                    # _LOGGER.debug( "async_turn (2)" )
                     return
                 self._attr_available = False
                 self._command_lock_flag = False
                 self.async_write_ha_state()
-                _LOGGER.debug( "async_turn (%d) '%s' slave:'%s' Error writing data. (%s)", 
+                _LOGGER.error( "async_turn (%d) '%s' slave:'%s' Error writing data. (%s)", 
                     round(time.perf_counter()-self._command_start_time, 2), self._attr_board, self._slave, str(result))
                 return
 

@@ -220,9 +220,9 @@ class ModbusBinarySensor(BoardsBaseStructPlatform, RestoreEntity, BinarySensorEn
         return result
     
     async def async_update(self, now: datetime | None = None) -> None:
-        start_time = time.perf_counter()
+        # start_time = time.perf_counter()
         # _LOGGER.debug('async_update %s %s %s', str(self._update_lock_flag), str(self._platform_ready), str(self._state_constraint))
-        start_time = time.perf_counter()
+        # start_time = time.perf_counter()
         if not self._platform_ready:
             self._cancel_call = async_call_later(
                 self.hass, timedelta(seconds=randint(30, 60)), self.async_update
@@ -241,6 +241,9 @@ class ModbusBinarySensor(BoardsBaseStructPlatform, RestoreEntity, BinarySensorEn
             return  
         
         async with self._update_lock:
+            if self._lazy_errors == self._lazy_error_count:
+                self._command_start_time = time.perf_counter()
+
             self._update_lock_flag = True
             self._cancel_call = None
             operation = await self.async_board_read_data(Platform.SENSOR)
@@ -283,7 +286,7 @@ class ModbusBinarySensor(BoardsBaseStructPlatform, RestoreEntity, BinarySensorEn
             self.async_write_ha_state()
 
             _LOGGER.debug( "async_update (%d) '%s' slave:'%s'::%s data:'%s' result:'%s'", 
-                round(time.perf_counter()-start_time, 2), self._attr_board, self._slave, str(self._slave_count),
+                round(time.perf_counter()-self._command_start_time, 2), self._attr_board, self._slave, str(self._slave_count),
                     str(sensor_data.registers if sensor_data.registers else sensor_data.bits),  str(result))
             self._update_lock_flag = False
 

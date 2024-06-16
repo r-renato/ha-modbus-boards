@@ -161,6 +161,8 @@ class ModbusRegisterSensor(BoardsBaseStructPlatform, RestoreSensor, SensorEntity
         self._attr_device_class = self._attr_sensor_registers[SensorRegIdx.BLOCK_DEVICE_CLASS]
         self._attr_native_unit_of_measurement = self._attr_sensor_registers[SensorRegIdx.BLOCK_UNIT_OF_MEASURE]
 
+        self._offset = internal_sensors[CONF_OFFSET]
+
     async def async_setup_slaves(
         self, hass: HomeAssistant, slave_count: int, entry: dict[str, Any], internal_sensor: dict[str, Any]
     ) -> list[SlaveSensor]:
@@ -191,7 +193,6 @@ class ModbusRegisterSensor(BoardsBaseStructPlatform, RestoreSensor, SensorEntity
             self._attr_native_value = state.native_value
 
     async def async_update(self, now: datetime | None = None) -> None:
-        start_time = time.perf_counter()
         if not self._platform_ready:
             self._cancel_call = async_call_later(
                 self.hass, timedelta(seconds=randint(30, 60)), self.async_update
@@ -210,10 +211,13 @@ class ModbusRegisterSensor(BoardsBaseStructPlatform, RestoreSensor, SensorEntity
             return  
         
         async with self._update_lock:
+            if self._lazy_errors == self._lazy_error_count:
+                self._command_start_time = time.perf_counter()
+
             self._update_lock_flag = True
             self._cancel_call = None
+
             operation = await self.async_board_read_data(Platform.SENSOR)
-            
             sensor_data = self._attr_board_blocks[self._attr_sensor_registers[SensorRegIdx.BLOCK_NAME]]
 
             if not operation or not sensor_data or not hasattr(sensor_data, "registers"):
@@ -226,14 +230,14 @@ class ModbusRegisterSensor(BoardsBaseStructPlatform, RestoreSensor, SensorEntity
                     return
                 self._lazy_errors = self._lazy_error_count
 
-                self._attr_available = False
-                self._attr_native_value = None
-                if self._coordinator:
-                    self._coordinator.async_set_updated_data(None)
+                # self._attr_available = False
+                # self._attr_native_value = None
+                # if self._coordinator:
+                #     self._coordinator.async_set_updated_data(None)
                 self.async_write_ha_state()
                 self._update_lock_flag = False
-                _LOGGER.debug( "async_update (%d) '%s' slave:'%s' Error reading data. (%s)", 
-                    round(time.perf_counter()-start_time, 2), self._attr_board, self._slave, str(sensor_data))
+                _LOGGER.error( "async_update (%d) '%s' slave:'%s' Error reading data. (%s)", 
+                    round(time.perf_counter()-self._command_start_time, 2), self._attr_board, self._slave, str(sensor_data))
                 return
             
             result = DataProcessing.unpack_data( 
@@ -251,15 +255,15 @@ class ModbusRegisterSensor(BoardsBaseStructPlatform, RestoreSensor, SensorEntity
                     # )
                     # self._attr_native_value = result_array[0]
                     self._coordinator.async_set_updated_data(self._attr_board_blocks)
-                else:
-                    self._attr_native_value = None
-                    self._coordinator.async_set_updated_data(None)                
-            self._attr_native_value = result
+                # else:
+                #     self._attr_native_value = None
+                #     self._coordinator.async_set_updated_data(None)                
+            self._attr_native_value = result + self._offset
             self._attr_available = self._attr_native_value is not None
             self.async_write_ha_state()
 
-            _LOGGER.debug( "async_update (%d) '%s' slave:'%s' data:'%s' result:'%s'", 
-                round(time.perf_counter()-start_time, 2), self._attr_board, self._slave, str(sensor_data), str(result))
+            _LOGGER.debug( "async_update (%d) '%s' slave:'%s' data:'%s' result:'%s' offset: '%s'", 
+                round(time.perf_counter()-self._command_start_time, 2), self._attr_board, self._slave, str(sensor_data), str(result), str(self._offset))
             self._update_lock_flag = False
         
     # async def async_update_old(self, now: datetime | None = None) -> None:
@@ -343,7 +347,7 @@ class SlaveSensor(
         self._max_value = None
         self._zero_suppress = None
         self._nan_value = None
-        self._offset = entry[CONF_OFFSET]
+        self._offset = internal_sensors[CONF_OFFSET]
 
         super().__init__(coordinator)
     
@@ -369,6 +373,8 @@ class SlaveSensor(
             data[ "manufacturer" ] = self._attr_manufacturer
         if self._attr_model:
             data[ "model" ] = self._attr_model
+        if len(self._attr_sensor_registers) > SensorRegIdx.GUIDE:
+            data[ "guide" ] = self._attr_sensor_registers[SensorRegIdx.GUIDE]
         return data
     
     @callback
@@ -387,12 +393,17 @@ class SlaveSensor(
                     (self._attr_platform_registers[self._attr_sensor_registers[SensorRegIdx.BLOCK_NAME]])[BoardBlockRegIdx.BLOCK_DEF_DATATYPE],
                     self._attr_sensor_registers[SensorRegIdx.BLOCK_DATA_SCALE],
                     self._attr_sensor_registers[SensorRegIdx.BLOCK_DATA_PRECISION],
-            )
+            ) 
 
-            _LOGGER.debug( "_handle_coordinator_update '%s' %s", str(sensor_data.registers), str(result))
+            # _LOGGER.debug( "_handle_coordinator_update '%s' %s", str(sensor_data.registers), str(result), str(self._offset))
+            _LOGGER.debug( "_handle_coordinator_update (0) '%s' slave:'%s' data:'%s' result:'%s' offset: '%s'", 
+                self._attr_board, self._slave, str(sensor_data), str(result), str(self._offset))
 
             # self._attr_native_value = result[self._idx] if result else None
-            self._attr_native_value = result
+            self._attr_native_value = result + self._offset
+            self._attr_available = True
         else:
+            self._attr_available = False
             self._attr_native_value = None
+
         super()._handle_coordinator_update()

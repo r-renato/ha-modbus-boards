@@ -175,6 +175,31 @@ RER_TEMPERATURA_MANDATA_ARIA = "ro_temperatura_mandata_aria"
 
 HMI080_DEVICE_POWER_CONTROL = "rw_device_power_control"
 
+HMI080_RW_WEEKLY_TIMER = "rw_weekly_timer"
+HMI080_RW_CLOCK_TIMER = "rw_clock_timer"
+HMI080_RW_TEMP_TIMER = "rw_temp_timer"
+HMI080_RW_GATE_CTRL = "rw_gate_ctrl"
+HMI080_RW_SOLAR_HEATER = "rw_solar_heater"
+HMI080_RW_CTRL_STATE = "rw_ctrl_state"
+HMI080_RW_FAST_HOT_WATER = "rw_fast_hot_water"
+HMI080_RW_COOL_AND_HOT_WATER_PRIORITY = "rw_cool_and_hot_water_priority"
+HMI080_RW_HEAT_AND_HOT_WATER_PRIORITY = "rw_heat_and_hot_water_priority"
+HMI080_RW_QUITE_MODE = "rw_quite_mode"
+HMI080_RW_WEATHER_DEPEND = "rw_weather_depend"
+HMI080_RW_DISINFECTION = "rw_disinfection"
+HMI080_RW_FLOOR_DEBUG = "rw_floor_debug"
+HMI080_RW_FLOOR_DEBUG_START_STOP = "rw_floor_debug_start_stop"
+HMI080_RW_EMERGENCE_MODE = "rw_emergence_mode"
+HMI080_RW_OTHER_THERMAL = "rw_other_thermal"
+HMI080_RW_WATER_TANK = "rw_water_tank"
+HMI080_RW_SOLAR_SETTING = "rw_solar_setting"
+HMI080_RW_REMOTE_SENSOR = "rw_remote_sensor"
+HMI080_RW_HOLIDAY_MODE = "rw_holiday_mode"
+HMI080_RW_REFRI_RECOVERY = "rw_refri_recovery"
+HMI080_RW_MANUAL_DEFROST = "rw_manual_defrost"
+HMI080_RW_COOL_2_WAY_VALVE = "rw_cool_2_way_valve"
+
+
 HMI080_MODE = "rw_mode"
 HMI080_OPTIONAL_E_HEATER = "rw_optional_e_heater"
 HMI080_DISINFECTION_TEMP = "rw_disinfection_temp"
@@ -214,7 +239,7 @@ HMI080_OPTIONAL_E_HEATER_LOGIC = "rw_optional_e_heater_logic"
 HMI080_CURRENT_LIMIT_VALUE = "rw_current_limit_value"
 HMI080_RW_THERMOSTAT = "rw_thermostat"
 HMI080_FORCE_MODE = "rw_force_mode"
-HMI080_AIR_REMOVAL = "rw_air_removal "
+HMI080_AIR_REMOVAL = "rw_air_removal"
 
 HMI080_UNIT_STATUS = "ro_unit_status"
 HMI080_T_OUTDOOR = "ro_t_outdoor"
@@ -407,6 +432,7 @@ class SensorRegIdx(IntEnum):
     BLOCK_STATE_CLASS = 4
     BLOCK_DEVICE_CLASS = 5
     BLOCK_UNIT_OF_MEASURE = 6
+    GUIDE = 7
 
 class BinarySensorRegIdx(IntEnum):
     BLOCK_NAME = 0
@@ -417,6 +443,7 @@ class BinarySensorRegIdx(IntEnum):
     BLOCK_STATE_CLASS = 4
     BLOCK_DEVICE_CLASS = 5
     BLOCK_UNIT_OF_MEASURE = 6
+    GUIDE = 7
 
 # RBD_BLOCK_NAME = 0
 # RBD_BLOCK_NDX = 1
@@ -1722,13 +1749,14 @@ AERMEC_HMI080_REGISTERS = {
     Platform.SENSOR : {
         BoardBlock.REGISTERS_BLOCK_1 : (
 # read      0:address, 1:quantity, 2:function, 3:data_type 
-            0x75, 20, CALL_TYPE_REGISTER_HOLDING, DataType.UINT16,      
+            0x75, 21, CALL_TYPE_REGISTER_HOLDING, DataType.INT16,      
         ),    
         HMI080_UNIT_STATUS : (
 #           0:block_name, 1:index, 2:precision, 3:scale
             BoardBlock.REGISTERS_BLOCK_1, 0x00, 0, 1,
 # entity    4:state_class, 5:device_class, 6:unit_of_measurement
-            None, None, None
+            None, None, None,
+            "01. Cool, 02. Heat, 06. Hot water, 08. Off"
         ),    
         HMI080_T_OUTDOOR : (
 #           0:block_name, 1:index, 2:precision, 3:scale
@@ -1808,39 +1836,46 @@ AERMEC_HMI080_REGISTERS = {
 # entity    4:state_class, 5:device_class, 6:unit_of_measurement
             "measurement", "temperature", "°C",
         ),
+        HMI080_T_LIQUID_PIPE : (
+#           0:block_name, 1:index, 2:precision, 3:scale
+            BoardBlock.REGISTERS_BLOCK_1, 0x0E, 1, 0.1,
+# entity    4:state_class, 5:device_class, 6:unit_of_measurement
+            "measurement", "temperature", "°C",
+        ),
         HMI080_THERMOSTAT : (
 #           0:block_name, 1:index, 2:precision, 3:scale
-            BoardBlock.REGISTERS_BLOCK_1, 0x0E, 0, 1,
+            BoardBlock.REGISTERS_BLOCK_1, 0x0F, 0, 1,
 # entity    4:state_class, 5:device_class, 6:unit_of_measurement
-            None, None, None
+            None, None, None,
+            "1. Cool, 2. Heat, 3. Off"
         ),
         HMI080_T_FLOOR_DEBUG : (
 #           0:block_name, 1:index, 2:precision, 3:scale
-            BoardBlock.REGISTERS_BLOCK_1, 0x0F, 1, 0.1,
+            BoardBlock.REGISTERS_BLOCK_1, 0x10, 1, 0.1,
 # entity    4:state_class, 5:device_class, 6:unit_of_measurement
             "measurement", "temperature", "°C",
         ),
         HMI080_DEBUG_TIME : (
 #           0:block_name, 1:index, 2:precision, 3:scale
-            BoardBlock.REGISTERS_BLOCK_1, 0x10, 0, 1,
+            BoardBlock.REGISTERS_BLOCK_1, 0x11, 0, 1,
 # entity    4:state_class, 5:device_class, 6:unit_of_measurement
             None, None, None
         ),
         HMI080_DISINFECTION : (
 #           0:block_name, 1:index, 2:precision, 3:scale
-            BoardBlock.REGISTERS_BLOCK_1, 0x11, 0, 1,
+            BoardBlock.REGISTERS_BLOCK_1, 0x12, 0, 1,
 # entity    4:state_class, 5:device_class, 6:unit_of_measurement
             None, None, None
         ),
         HMI080_ERROR_TIME_FOR_FLOOR_DEBUG : (
 #           0:block_name, 1:index, 2:precision, 3:scale
-            BoardBlock.REGISTERS_BLOCK_1, 0x12, 0, 1,
+            BoardBlock.REGISTERS_BLOCK_1, 0x13, 0, 1,
 # entity    4:state_class, 5:device_class, 6:unit_of_measurement
             None, None, None
         ),
         HMI080_T_WEATHER_DEPEND : (
 #           0:block_name, 1:index, 2:precision, 3:scale
-            BoardBlock.REGISTERS_BLOCK_1, 0x13, 1, 0.1,
+            BoardBlock.REGISTERS_BLOCK_1, 0x14, 1, 0.1,
 # entity    4:state_class, 5:device_class, 6:unit_of_measurement
             "measurement", "temperature", "°C",
         ),        
@@ -1852,11 +1887,131 @@ AERMEC_HMI080_REGISTERS = {
         ),
         BoardBlock.REGISTERS_BLOCK_2 : (
 # read      0:address, 1:quantity, 2:function, 3:data_type 
-            0x00, 199, CALL_TYPE_COIL, DataType.UINT16,             
+            0x00, 199, CALL_TYPE_COIL, DataType.UINT8,             
         ),    
         HMI080_DEVICE_POWER_CONTROL: (
 #           0:block_name, 1:index, 2:address, 3:function, 4:open, 5:close
             BoardBlock.REGISTERS_BLOCK_1, 0x00, 0x002A, CALL_TYPE_WRITE_REGISTERS, 0xAA, 0x55
+#           6:guide
+        ),
+        HMI080_RW_WEEKLY_TIMER: (
+#           0:block_name, 1:index, 2:address, 3:function, 5:close, 4:open
+            BoardBlock.REGISTERS_BLOCK_2, 0x08, 0x08, CALL_TYPE_WRITE_COILS, True, False
+#           6:guide
+        ),
+        HMI080_RW_CLOCK_TIMER: (
+#           0:block_name, 1:index, 2:address, 3:function, 5:close, 4:open
+            BoardBlock.REGISTERS_BLOCK_2, 0x09, 0x09, CALL_TYPE_WRITE_COILS, True, False
+#           6:guide
+        ),
+        HMI080_RW_TEMP_TIMER: (
+#           0:block_name, 1:index, 2:address, 3:function, 5:close, 4:open
+            BoardBlock.REGISTERS_BLOCK_2, 0x0A, 0x0A, CALL_TYPE_WRITE_COILS, True, False
+#           6:guide
+        ),
+        HMI080_RW_GATE_CTRL: (
+#           0:block_name, 1:index, 2:address, 3:function, 5:close, 4:open
+            BoardBlock.REGISTERS_BLOCK_2, 0x0B, 0x0B, CALL_TYPE_WRITE_COILS, True, False
+#           6:guide
+        ),
+        HMI080_RW_SOLAR_HEATER: (
+#           0:block_name, 1:index, 2:address, 3:function, 5:close, 4:open
+            BoardBlock.REGISTERS_BLOCK_2, 0x10, 0x10, CALL_TYPE_WRITE_COILS, True, False
+#           6:guide
+        ),
+        HMI080_RW_CTRL_STATE: (
+#           0:block_name, 1:index, 2:address, 3:function, 5:close, 4:open
+            BoardBlock.REGISTERS_BLOCK_2, 0x11, 0x11, CALL_TYPE_WRITE_COILS, True, False
+#           6:guide
+        ),
+        HMI080_RW_FAST_HOT_WATER: (
+#           0:block_name, 1:index, 2:address, 3:function, 5:close, 4:open
+            BoardBlock.REGISTERS_BLOCK_2, 0x12, 0x12, CALL_TYPE_WRITE_COILS, True, False
+#           6:guide
+        ),
+        HMI080_RW_COOL_AND_HOT_WATER_PRIORITY: (
+#           0:block_name, 1:index, 2:address, 3:function, 5:close, 4:open
+            BoardBlock.REGISTERS_BLOCK_2, 0x13, 0x13, CALL_TYPE_WRITE_COILS, True, False
+#           6:guide
+        ),
+        HMI080_RW_HEAT_AND_HOT_WATER_PRIORITY: (
+#           0:block_name, 1:index, 2:address, 3:function, 5:close, 4:open
+            BoardBlock.REGISTERS_BLOCK_2, 0x14, 0x14, CALL_TYPE_WRITE_COILS, True, False
+#           6:guide
+        ),
+        HMI080_RW_QUITE_MODE: (
+#           0:block_name, 1:index, 2:address, 3:function, 5:close, 4:open
+            BoardBlock.REGISTERS_BLOCK_2, 0x15, 0x15, CALL_TYPE_WRITE_COILS, True, False
+#           6:guide
+        ),
+        HMI080_RW_WEATHER_DEPEND: (
+#           0:block_name, 1:index, 2:address, 3:function, 5:close, 4:open
+            BoardBlock.REGISTERS_BLOCK_2, 0x16, 0x16, CALL_TYPE_WRITE_COILS, True, False
+#           6:guide
+        ),
+        HMI080_RW_DISINFECTION: (
+#           0:block_name, 1:index, 2:address, 3:function, 5:close, 4:open
+            BoardBlock.REGISTERS_BLOCK_2, 0x17, 0x17, CALL_TYPE_WRITE_COILS, True, False
+#           6:guide
+        ),
+        HMI080_RW_FLOOR_DEBUG: (
+#           0:block_name, 1:index, 2:address, 3:function, 5:close, 4:open
+            BoardBlock.REGISTERS_BLOCK_2, 0x18, 0x18, CALL_TYPE_WRITE_COILS, True, False
+#           6:guide
+        ),
+        HMI080_RW_FLOOR_DEBUG_START_STOP: (
+#           0:block_name, 1:index, 2:address, 3:function, 5:close, 4:open
+            BoardBlock.REGISTERS_BLOCK_2, 0x19, 0x19, CALL_TYPE_WRITE_COILS, True, False
+#           6:guide
+        ),
+        HMI080_RW_EMERGENCE_MODE: (
+#           0:block_name, 1:index, 2:address, 3:function, 5:close, 4:open
+            BoardBlock.REGISTERS_BLOCK_2, 0x1A, 0x1A, CALL_TYPE_WRITE_COILS, True, False
+#           6:guide
+        ),
+        HMI080_RW_EMERGENCE_MODE: (
+#           0:block_name, 1:index, 2:address, 3:function, 5:close, 4:open
+            BoardBlock.REGISTERS_BLOCK_2, 0x1A, 0x1A, CALL_TYPE_WRITE_COILS, True, False
+#           6:guide
+        ),
+        HMI080_RW_OTHER_THERMAL: (
+#           0:block_name, 1:index, 2:address, 3:function, 5:close, 4:open
+            BoardBlock.REGISTERS_BLOCK_2, 0x1B, 0x1B, CALL_TYPE_WRITE_COILS, True, False
+#           6:guide
+        ),
+        HMI080_RW_WATER_TANK: (
+#           0:block_name, 1:index, 2:address, 3:function, 5:close, 4:open
+            BoardBlock.REGISTERS_BLOCK_2, 0x1D, 0x1D, CALL_TYPE_WRITE_COILS, True, False
+#           6:guide
+        ),
+        HMI080_RW_SOLAR_SETTING: (
+#           0:block_name, 1:index, 2:address, 3:function, 5:close, 4:open
+            BoardBlock.REGISTERS_BLOCK_2, 0x1F, 0x1F, CALL_TYPE_WRITE_COILS, True, False
+#           6:guide
+        ),
+        HMI080_RW_REMOTE_SENSOR: (
+#           0:block_name, 1:index, 2:address, 3:function, 5:close, 4:open
+            BoardBlock.REGISTERS_BLOCK_2, 0x21, 0x21, CALL_TYPE_WRITE_COILS, True, False
+#           6:guide
+        ),
+        HMI080_RW_HOLIDAY_MODE: (
+#           0:block_name, 1:index, 2:address, 3:function, 5:close, 4:open
+            BoardBlock.REGISTERS_BLOCK_2, 0x22, 0x22, CALL_TYPE_WRITE_COILS, True, False
+#           6:guide
+        ),
+        HMI080_RW_REFRI_RECOVERY: (
+#           0:block_name, 1:index, 2:address, 3:function, 5:close, 4:open
+            BoardBlock.REGISTERS_BLOCK_2, 0x23, 0x23, CALL_TYPE_WRITE_COILS, True, False
+#           6:guide
+        ),
+        HMI080_RW_MANUAL_DEFROST: (
+#           0:block_name, 1:index, 2:address, 3:function, 5:close, 4:open
+            BoardBlock.REGISTERS_BLOCK_2, 0x24, 0x24, CALL_TYPE_WRITE_COILS, True, False
+#           6:guide
+        ),
+        HMI080_RW_COOL_2_WAY_VALVE: (
+#           0:block_name, 1:index, 2:address, 3:function, 5:close, 4:open
+            BoardBlock.REGISTERS_BLOCK_2, 0x25, 0x25, CALL_TYPE_WRITE_COILS, True, False
 #           6:guide
         ),
     },
@@ -2111,7 +2266,7 @@ AERMEC_HMI080_REGISTERS = {
         ),
         HMI080_LOWER_RT_COOL : (
 #           0:block_name, 1:index, 2:precision, 3:scale
-            BoardBlock.REGISTERS_BLOCK_1, 0x17, 0, 1, None,
+            BoardBlock.REGISTERS_BLOCK_1, 0x18, 0, 1, None,
 # entity    4:state_class, 5:device_class, 6:unit_of_measurement
             "measurement", "temperature", "°C",
 # write     7:address, 8:function, 9:scale
@@ -2121,7 +2276,7 @@ AERMEC_HMI080_REGISTERS = {
         ),
         HMI080_UPPER_WT_COOL : (
 #           0:block_name, 1:index, 2:precision, 3:scale
-            BoardBlock.REGISTERS_BLOCK_1, 0x18, 0, 1, None,
+            BoardBlock.REGISTERS_BLOCK_1, 0x19, 0, 1, None,
 # entity    4:state_class, 5:device_class, 6:unit_of_measurement
             "measurement", "temperature", "°C",
 # write     7:address, 8:function, 9:scale
@@ -2131,7 +2286,7 @@ AERMEC_HMI080_REGISTERS = {
         ),
         HMI080_LOWER_WT_COOL : (
 #           0:block_name, 1:index, 2:precision, 3:scale
-            BoardBlock.REGISTERS_BLOCK_1, 0x19, 0, 1, None,
+            BoardBlock.REGISTERS_BLOCK_1, 0x1A, 0, 1, None,
 # entity    4:state_class, 5:device_class, 6:unit_of_measurement
             "measurement", "temperature", "°C",
 # write     7:address, 8:function, 9:scale
@@ -2141,7 +2296,7 @@ AERMEC_HMI080_REGISTERS = {
         ),
         HMI080_DELTA_T_COOL : (
 #           0:block_name, 1:index, 2:precision, 3:scale
-            BoardBlock.REGISTERS_BLOCK_1, 0x1A, 0, 1, None,
+            BoardBlock.REGISTERS_BLOCK_1, 0x1B, 0, 1, None,
 # entity    4:state_class, 5:device_class, 6:unit_of_measurement
             "measurement", "temperature", "°C",
 # write     7:address, 8:function, 9:scale
@@ -2151,7 +2306,7 @@ AERMEC_HMI080_REGISTERS = {
         ),
         HMI080_DELTA_T_HEAT : (
 #           0:block_name, 1:index, 2:precision, 3:scale
-            BoardBlock.REGISTERS_BLOCK_1, 0x1B, 0, 1, None,
+            BoardBlock.REGISTERS_BLOCK_1, 0x1C, 0, 1, None,
 # entity    4:state_class, 5:device_class, 6:unit_of_measurement
             "measurement", "temperature", "°C",
 # write     7:address, 8:function, 9:scale
@@ -2161,7 +2316,7 @@ AERMEC_HMI080_REGISTERS = {
         ),
         HMI080_DELTA_T_HOT_WATER : (
 #           0:block_name, 1:index, 2:precision, 3:scale
-            BoardBlock.REGISTERS_BLOCK_1, 0x1C, 0, 1, None,
+            BoardBlock.REGISTERS_BLOCK_1, 0x1D, 0, 1, None,
 # entity    4:state_class, 5:device_class, 6:unit_of_measurement
             "measurement", "temperature", "°C",
 # write     7:address, 8:function, 9:scale
@@ -2171,7 +2326,7 @@ AERMEC_HMI080_REGISTERS = {
         ),
         HMI080_DELTA_T_ROOM_TEMP : (
 #           0:block_name, 1:index, 2:precision, 3:scale
-            BoardBlock.REGISTERS_BLOCK_1, 0x1D, 0, 1, None,
+            BoardBlock.REGISTERS_BLOCK_1, 0x1E, 0, 1, None,
 # entity    4:state_class, 5:device_class, 6:unit_of_measurement
             "measurement", "temperature", "°C",
 # write     7:address, 8:function, 9:scale
@@ -2181,7 +2336,7 @@ AERMEC_HMI080_REGISTERS = {
         ),
         HMI080_COOL_RUN_TIME : (
 #           0:block_name, 1:index, 2:precision, 3:scale
-            BoardBlock.REGISTERS_BLOCK_1, 0x1E, 0, 1, None,
+            BoardBlock.REGISTERS_BLOCK_1, 0x1F, 0, 1, None,
 # entity    4:state_class, 5:device_class, 6:unit_of_measurement
             None, None, None,
 # write     7:address, 8:function, 9:scale
@@ -2191,7 +2346,7 @@ AERMEC_HMI080_REGISTERS = {
         ),
         HMI080_HEAT_RUN_TIME : (
 #           0:block_name, 1:index, 2:precision, 3:scale
-            BoardBlock.REGISTERS_BLOCK_1, 0x1F, 0, 1, None,
+            BoardBlock.REGISTERS_BLOCK_1, 0x20, 0, 1, None,
 # entity    4:state_class, 5:device_class, 6:unit_of_measurement
             None, None, None,
 # write     7:address, 8:function, 9:scale
@@ -2202,7 +2357,7 @@ AERMEC_HMI080_REGISTERS = {
         ),
         HMI080_OTHER_THERMAL_LOGIC : (
 #           0:block_name, 1:index, 2:precision, 3:scale
-            BoardBlock.REGISTERS_BLOCK_1, 0x20, 0, 1, None,
+            BoardBlock.REGISTERS_BLOCK_1, 0x21, 0, 1, None,
 # entity    4:state_class, 5:device_class, 6:unit_of_measurement
             None, None, None,
 # write     7:address, 8:function, 9:scale
@@ -2212,7 +2367,7 @@ AERMEC_HMI080_REGISTERS = {
         ),
         HMI080_TANK_HEATER : (
 #           0:block_name, 1:index, 2:precision, 3:scale
-            BoardBlock.REGISTERS_BLOCK_1, 0x21, 0, 1, None,
+            BoardBlock.REGISTERS_BLOCK_1, 0x22, 0, 1, None,
 # entity    4:state_class, 5:device_class, 6:unit_of_measurement
             None, None, None,
 # write     7:address, 8:function, 9:scale
@@ -2222,7 +2377,7 @@ AERMEC_HMI080_REGISTERS = {
         ),
         HMI080_OPTIONAL_E_HEATER_LOGIC : (
 #           0:block_name, 1:index, 2:precision, 3:scale
-            BoardBlock.REGISTERS_BLOCK_1, 0x22, 0, 1, None,
+            BoardBlock.REGISTERS_BLOCK_1, 0x23, 0, 1, None,
 # entity    4:state_class, 5:device_class, 6:unit_of_measurement
             None, None, None,
 # write     7:address, 8:function, 9:scale
@@ -2232,7 +2387,7 @@ AERMEC_HMI080_REGISTERS = {
         ),
         HMI080_CURRENT_LIMIT_VALUE : (
 #           0:block_name, 1:index, 2:precision, 3:scale
-            BoardBlock.REGISTERS_BLOCK_1, 0x23, 0, 1, None,
+            BoardBlock.REGISTERS_BLOCK_1, 0x24, 0, 1, None,
 # entity    4:state_class, 5:device_class, 6:unit_of_measurement
             None, None, None,
 # write     7:address, 8:function, 9:scale
@@ -2242,7 +2397,7 @@ AERMEC_HMI080_REGISTERS = {
         ),
         HMI080_RW_THERMOSTAT : (
 #           0:block_name, 1:index, 2:precision, 3:scale
-            BoardBlock.REGISTERS_BLOCK_1, 0x24, 0, 1, None,
+            BoardBlock.REGISTERS_BLOCK_1, 0x25, 0, 1, None,
 # entity    4:state_class, 5:device_class, 6:unit_of_measurement
             None, None, None,
 # write     7:address, 8:function, 9:scale
@@ -2253,7 +2408,7 @@ AERMEC_HMI080_REGISTERS = {
         ),
         HMI080_FORCE_MODE : (
 #           0:block_name, 1:index, 2:precision, 3:scale
-            BoardBlock.REGISTERS_BLOCK_1, 0x25, 0, 1, None,
+            BoardBlock.REGISTERS_BLOCK_1, 0x26, 0, 1, None,
 # entity    4:state_class, 5:device_class, 6:unit_of_measurement
             None, None, None,
 # write     7:address, 8:function, 9:scale
@@ -2264,7 +2419,7 @@ AERMEC_HMI080_REGISTERS = {
         ),
         HMI080_AIR_REMOVAL : (
 #           0:block_name, 1:index, 2:precision, 3:scale
-            BoardBlock.REGISTERS_BLOCK_1, 0x26, 0, 1, None,
+            BoardBlock.REGISTERS_BLOCK_1, 0x27, 0, 1, None,
 # entity    4:state_class, 5:device_class, 6:unit_of_measurement
             None, None, None,
 # write     7:address, 8:function, 9:scale

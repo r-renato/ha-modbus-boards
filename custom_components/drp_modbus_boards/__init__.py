@@ -419,6 +419,7 @@ SENSOR_SCHEMA = vol.All(
                                     vol.Optional(CONF_FRIENDLY_NAME): cv.string,
                                     vol.Optional(CONF_UNIQUE_ID): cv.string,
                                     vol.Optional(CONF_SCAN_INTERVAL): cv.positive_int,
+                                    vol.Optional(CONF_OFFSET, default=0): number_validator,
                                 })]
             ),            
             vol.Optional(CONF_DEVICE_CLASS): SENSOR_DEVICE_CLASSES_SCHEMA,

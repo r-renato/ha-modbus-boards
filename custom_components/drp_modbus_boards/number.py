@@ -185,7 +185,6 @@ class ModbusRegisterNumber(
         _LOGGER.debug( 'async_added_to_hass: %s', str(self._switch_constraint) )
 
     async def async_update(self, now: datetime | None = None) -> None:
-        start_time = time.perf_counter()
         if not self._platform_ready:
             self._cancel_call = async_call_later(
                 self.hass, timedelta(seconds=randint(30, 60)), self.async_update
@@ -204,6 +203,9 @@ class ModbusRegisterNumber(
             return        
 
         async with self._update_lock:
+            if self._lazy_errors == self._lazy_error_count:
+                self._command_start_time = time.perf_counter()
+
             self._update_lock_flag = True
             self._cancel_call = None
             operation = await self.async_board_read_data(Platform.SENSOR)
@@ -226,8 +228,8 @@ class ModbusRegisterNumber(
                     self._coordinator.async_set_updated_data(None)
                 self.async_write_ha_state()
                 self._update_lock_flag = False
-                _LOGGER.debug( "async_update (%d) '%s' slave:'%s' Error reading data.", 
-                    round(time.perf_counter()-start_time, 2), self._attr_board, self._slave)
+                _LOGGER.error( "async_update (%d) '%s' slave:'%s' Error reading data.", 
+                    round(time.perf_counter()-self._command_start_time, 2), self._attr_board, self._slave)
                 return
             
             datatype = (self._attr_platform_registers[self._attr_sensor_registers[NumericRegIdx.BLOCK_NAME]])[BoardBlockRegIdx.BLOCK_DEF_DATATYPE]
@@ -257,7 +259,7 @@ class ModbusRegisterNumber(
             self.async_write_ha_state()
 
             _LOGGER.debug( "async_update (%d) '%s' slave:'%s' data:'%s' result:'%s'", 
-                round(time.perf_counter()-start_time, 2), self._attr_board, self._slave, str(sensor_data), str(result))
+                round(time.perf_counter()-self._command_start_time, 2), self._attr_board, self._slave, str(sensor_data), str(result))
             self._update_lock_flag = False
 
     async def async_set_native_value(self, value: float) -> None:
@@ -356,5 +358,8 @@ class SlaveModbusRegisterNumber(
                               self._attr_board, self._slave, str(self._slave_count),
                               str(sensor_data.registers if sensor_data.registers else sensor_data.bits),
                               str(datatype), str(result))
-
+        else:
+            self._attr_available = False
+            self._attr_native_value = None
+            
         super()._handle_coordinator_update()

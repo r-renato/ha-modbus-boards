@@ -125,6 +125,9 @@ class ModbusSwitch(BoardsBaseSwitch, SwitchEntity):
             self._state_on = self._state_off
             self._state_off = old
 
+        _LOGGER.info( "Setup for '%s' slave:'%s'", 
+            self._attr_board, self._slave)
+
     async def async_setup_slaves(
         self, hass: HomeAssistant, slave_count: int, entry: dict[str, Any], internal_switches: dict[str, Any]
     ) -> list[SlaveModbusSwitch]:
@@ -149,9 +152,13 @@ class ModbusSwitch(BoardsBaseSwitch, SwitchEntity):
             self._cancel_call = async_call_later(
                 self.hass, timedelta(seconds=randint(30, 60)), self.async_update
             )
+            _LOGGER.debug( "async_update (%d) '%s' slave:'%s' Error not self._platform_ready.", 
+                round(time.perf_counter()-start_time, 2), self._attr_board, self._slave)
             return
         
         if self._update_lock_flag:
+            _LOGGER.debug( "async_update (%d) '%s' slave:'%s' Error self._update_lock_flag.", 
+                round(time.perf_counter()-start_time, 2), self._attr_board, self._slave)
             return
         
         if self._state_constraint != 'on':
@@ -160,6 +167,8 @@ class ModbusSwitch(BoardsBaseSwitch, SwitchEntity):
             if self._coordinator:
                 self._coordinator.async_set_updated_data(None)
             self.async_write_ha_state()
+            _LOGGER.debug( "async_update (%d) '%s' slave:'%s' Error self._state_constraint != 'on'.", 
+                round(time.perf_counter()-start_time, 2), self._attr_board, self._slave)
             return  
         
         async with self._update_lock:
@@ -175,6 +184,8 @@ class ModbusSwitch(BoardsBaseSwitch, SwitchEntity):
                         self.hass, timedelta(seconds=1), self.async_update
                     )
                     self._update_lock_flag = False
+                    _LOGGER.debug( "async_update (%d) '%s' slave:'%s' Error not operation or not sensor_data or not hasattr.", 
+                        round(time.perf_counter()-start_time, 2), self._attr_board, self._slave)                    
                     return
                 self._lazy_errors = self._lazy_error_count
 
