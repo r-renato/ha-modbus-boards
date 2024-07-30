@@ -1268,7 +1268,7 @@ RER020I_EFHR0_EVO_REGISTERS = {
 # write     7:address, 8:function, 9:scale
             0x0F, CALL_TYPE_WRITE_REGISTERS, 10,
 # number    10:min, 11:max, 12:step, 13:mode (auto, box, slider)
-            10, 40, 1, MODE_BOX,
+            10, 40, 0.1, MODE_BOX,
         ),
         RER_ORE_ATTESA_PROMEMORIA_PULIZIA_FILTRI_SPORCHI : (
 #           0:block_name, 1:index, 2:precision, 3:scale
@@ -1278,7 +1278,7 @@ RER020I_EFHR0_EVO_REGISTERS = {
 # write     7:address, 8:function, 9:scale
             0x10, CALL_TYPE_WRITE_REGISTERS, 1,
 # number    10:min, 11:max, 12:step, 13:mode (auto, box, slider)
-            720, 4320, 1, MODE_BOX,
+            720, 4320, 0.1, MODE_BOX,
         ),
         RER_RICHIESTA_ATTIVAZIONE_COMPRESSORE : (
 #           0:block_name, 1:index, 2:precision, 3:scale

@@ -1,7 +1,7 @@
 """Support for Modbus."""
+
 from __future__ import annotations
 
-import time
 import asyncio
 from collections import namedtuple
 from collections.abc import Callable
@@ -13,7 +13,6 @@ from pymodbus.client import (
     AsyncModbusTcpClient,
     AsyncModbusUdpClient,
 )
-
 from pymodbus.exceptions import ModbusException
 from pymodbus.pdu import ModbusResponse
 from pymodbus.transaction import ModbusAsciiFramer, ModbusRtuFramer, ModbusSocketFramer
@@ -55,15 +54,12 @@ from .const import (
     CALL_TYPE_WRITE_REGISTERS,
     CONF_BAUDRATE,
     CONF_BYTESIZE,
-    CONF_CLOSE_COMM_ON_ERROR,
     CONF_MSG_WAIT,
     CONF_PARITY,
-    CONF_RETRIES,
-    CONF_RETRY_ON_EMPTY,
     CONF_STOPBITS,
     DEFAULT_HUB,
     MODBUS_DOMAIN as DOMAIN,
-    # PLATFORMS,
+    PLATFORMS,
     RTUOVERTCP,
     SERIAL,
     SERVICE_RESTART,
@@ -75,10 +71,8 @@ from .const import (
     TCP,
     UDP,
 )
-from .boards_const import (
-    MODBUS_DOMAIN as DOMAIN,
-    PLATFORMS,
-)
+from .validators import check_config
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -136,6 +130,10 @@ async def async_modbus_setup(
 
     await async_setup_reload_service(hass, DOMAIN, [DOMAIN])
 
+    if config[DOMAIN]:
+        config[DOMAIN] = check_config(hass, config[DOMAIN])
+        if not config[DOMAIN]:
+            return False
     if DOMAIN in hass.data and config[DOMAIN] == []:
         hubs = hass.data[DOMAIN]
         for name in hubs:
@@ -146,14 +144,8 @@ async def async_modbus_setup(
         hass.data[DOMAIN] = hub_collect = {}
 
     for conf_hub in config[DOMAIN]:
-        _LOGGER.debug( 'async_modbus_setup %s', conf_hub['host'])
-
-        if conf_hub['host'] in hub_collect:
-            hub_collect[conf_hub[CONF_NAME]] = hub_collect[conf_hub['host']]
-        else:
-            my_hub = ModbusHub(hass, conf_hub)
-            hub_collect[conf_hub[CONF_NAME]] = my_hub
-            hub_collect[conf_hub['host']] = my_hub
+        my_hub = ModbusHub(hass, conf_hub)
+        hub_collect[conf_hub[CONF_NAME]] = my_hub
 
         # modbus needs to be activated before components are loaded
         # to avoid a racing problem
@@ -166,8 +158,6 @@ async def async_modbus_setup(
                 hass.async_create_task(
                     async_load_platform(hass, component, DOMAIN, conf_hub, config)
                 )
-    _LOGGER.debug( 'async_modbus_setup %s / %s / %s / %s', 
-            DOMAIN, conf_hub[CONF_NAME], str(hub_collect.keys()), str(hub_collect['drp_modbus_boards_emeter_high_hub2']) )
 
     async def async_stop_modbus(event: Event) -> None:
         """Stop Modbus service."""
@@ -188,12 +178,7 @@ async def async_modbus_setup(
             slave = int(float(service.data[ATTR_SLAVE]))
         address = int(float(service.data[ATTR_ADDRESS]))
         value = service.data[ATTR_VALUE]
-        hub = hub_collect[
-            service.data[ATTR_HUB] if ATTR_HUB in service.data else DEFAULT_HUB
-        ]
-
-        _LOGGER.debug( '### async_write_register slave:%d, address:%d, value:%s', 
-             slave, address, str(value) )
+        hub = hub_collect[service.data.get(ATTR_HUB, DEFAULT_HUB)]
         if isinstance(value, list):
             await hub.async_pb_call(
                 slave,
@@ -215,9 +200,7 @@ async def async_modbus_setup(
             slave = int(float(service.data[ATTR_SLAVE]))
         address = service.data[ATTR_ADDRESS]
         state = service.data[ATTR_STATE]
-        hub = hub_collect[
-            service.data[ATTR_HUB] if ATTR_HUB in service.data else DEFAULT_HUB
-        ]
+        hub = hub_collect[service.data.get(ATTR_HUB, DEFAULT_HUB)]
         if isinstance(state, list):
             await hub.async_pb_call(slave, address, state, CALL_TYPE_WRITE_COILS)
         else:
@@ -252,6 +235,18 @@ async def async_modbus_setup(
 
     async def async_restart_hub(service: ServiceCall) -> None:
         """Restart Modbus hub."""
+        async_create_issue(
+            hass,
+            DOMAIN,
+            "deprecated_restart",
+            breaks_in_ha_version="2024.11.0",
+            is_fixable=False,
+            severity=IssueSeverity.WARNING,
+            translation_key="deprecated_restart",
+        )
+        _LOGGER.warning(
+            "`modbus.restart` is deprecated and will be removed in version 2024.11"
+        )
         async_dispatcher_send(hass, SIGNAL_START_ENTITY)
         hub = hub_collect[service.data[ATTR_HUB]]
         await hub.async_restart()
@@ -282,7 +277,6 @@ class ModbusHub:
         self._async_cancel_listener: Callable[[], None] | None = None
         self._in_error = False
         self._lock = asyncio.Lock()
-        self._waiting_count = 0
         self.hass = hass
         self.name = client_config[CONF_NAME]
         self._config_type = client_config[CONF_TYPE]
@@ -328,8 +322,6 @@ class ModbusHub:
             self._msg_wait = 30 / 1000
         else:
             self._msg_wait = 0
-
-        self._msg_wait = 0.25
 
     def _log_error(self, text: str, error_state: bool = True) -> None:
         log_text = f"Pymodbus: {self.name}: {text}"
@@ -440,27 +432,13 @@ class ModbusHub:
         use_call: str,
     ) -> ModbusResponse | None:
         """Convert async to sync pymodbus call."""
-        start_time = time.perf_counter()
         if self._config_delay:
             return None
-        
-        self._waiting_count += 1
         async with self._lock:
-            # _LOGGER.debug( "async_pb_call (%s)", self._waiting_count )
             if not self._client:
-                self._waiting_count -= 1
                 return None
             result = await self.low_level_pb_call(unit, address, value, use_call)
-
-            _LOGGER.debug( 'async_pb_call (sec.%s, wtgc.%s) [%s] slave:%d, addr:%d, qty:%s, fn:%s,  res:%s,registers:%s, bits: %s', 
-                str(round(time.perf_counter()-start_time, 2)), self._waiting_count,
-                self._pb_params["host"], unit, address, str(value), str(use_call), 
-                str(result), str(result.registers if result else None), str(result.bits if result else None),
-            )
-
             if self._msg_wait:
                 # small delay until next request/response
-                _LOGGER.debug( 'self._msg_wait %s', self._msg_wait)
                 await asyncio.sleep(self._msg_wait)
-            self._waiting_count -= 1
             return result
