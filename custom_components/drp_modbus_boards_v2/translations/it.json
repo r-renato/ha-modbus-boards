@@ -1,0 +1,9 @@
+{
+    "config": {
+        "abort": {
+            "yaml_only": "Questa integrazione si configura solo tramite YAML.",
+            "already_configured": "Questa configurazione è già presente.",
+            "not_supported": "Operazione non supportata da questa integrazione."
+        }
+    }
+}

@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -e
+
+cd "$(dirname "$0")/.."
+echo "Deploy custom component from $(pwd) at $(date)"
+
+IMAGE_ID=$(sudo docker ps -a | grep homeassistant | awk '{ print $1 }')
+
+sudo docker stop $IMAGE_ID && sleep 5 
+sudo rm -Rf /home/drp/drp/homeassistant/custom_components/drp_modbus_boards_v2
+sudo cp -r custom_components/drp_modbus_boards_v2 /home/drp/drp/homeassistant/custom_components
+sudo docker start $IMAGE_ID
