@@ -87,7 +87,7 @@ def _eletechsup_n4dba06_regs():
                         ),
                         
                         min=0,
-                        max=100,
+                        max=100.5,
 
                         unit_of_measurement=PERCENTAGE
                     )

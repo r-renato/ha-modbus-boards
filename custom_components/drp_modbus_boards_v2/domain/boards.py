@@ -73,8 +73,8 @@ class RegisterFunction:
     function_read: Optional[RegisterFunctionRead] = None
     function_write: Optional[RegisterFunctionWrite] = None
 
-    min: Optional[int] = None
-    max: Optional[int] = None
+    min: Optional[float] = None
+    max: Optional[float] = None
     default: Optional[int] = None
 
     state_class: Optional[str] = None

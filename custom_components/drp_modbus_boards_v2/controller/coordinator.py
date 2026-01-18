@@ -93,10 +93,6 @@ class ModbusCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             if constraint is not None and constraint not in self._entity_constraint_ids:
                 self._entity_constraint_ids.append(constraint)
 
-        self._unsub_state_changes = subscribe_entity_state_changes(
-            self._hass, callback=self._entity_changed, entity_ids=self._entity_constraint_ids
-        )
-
         self._unsub_hastarted_event: Optional[Callable[[], None]] = hass.bus.async_listen_once(
             EVENT_HOMEASSISTANT_STARTED, self._async_first_update_entity_constraint_states
         )
@@ -111,6 +107,9 @@ class ModbusCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
     @callback
     async def _async_first_update_entity_constraint_states(self, event: Event) -> None:
+        if not self._entity_constraint_ids or len(self._entity_constraint_ids) == 0:
+            return
+
         for entity_id in self._entity_constraint_ids:
             state: State | None = entity_state(self._hass, entity_id=entity_id)
 
@@ -118,6 +117,10 @@ class ModbusCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 continue
             
             self._entity_constraint_states[entity_id] = state
+
+        self._unsub_state_changes = subscribe_entity_state_changes(
+            self._hass, callback=self._entity_changed, entity_ids=self._entity_constraint_ids
+        )
 
     @callback
     def _entity_changed(self, event: Event[EventStateChangedData]) -> None:

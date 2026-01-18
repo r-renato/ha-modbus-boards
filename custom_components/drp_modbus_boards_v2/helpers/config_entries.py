@@ -39,7 +39,7 @@ from homeassistant.const import (
 )
 
 from ..helpers.utils import slugify
-from ..helpers.logger import log_info
+from ..helpers.logger import log_error, log_info
 
 from ..domain.enums import Board
 from ..const import (
@@ -133,7 +133,8 @@ def subscribe_entity_state_changes(
         ids = [e for e in entity_ids if isinstance(e, str) and e.strip()]
 
     if not ids:
-        _LOGGER.error("setup_entity_change: nessun entity_id valido.")
+        log_error(
+            _LOGGER, "setup_entity_change: nessun entity_id valido (%s).", ids)
         return None
 
     unsubscribe: CALLBACK_TYPE = async_track_state_change_event(hass, ids, callback)
