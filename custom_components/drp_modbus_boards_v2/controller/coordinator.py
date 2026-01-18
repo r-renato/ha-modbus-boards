@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import timedelta
+import time
 from typing import Any, Callable, Optional
 import logging
 
@@ -71,10 +72,10 @@ class ModbusCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         self._modbus_hub: ModbusHub = modbus_store[modbus_hub_key]
 
-        self._updt_interval_seconds = timedelta(seconds=30)
-
         # Inizializza la struttura dati runtime per questa entry
         self._runtime: RuntimeEntryConfig = build_runtime_schema(config_type)
+
+        self._updt_interval_seconds = timedelta(seconds=self._runtime.scan_interval)
 
         self._entity_constraint_states: dict[str, State] = {}
         self._entity_constraint_ids: list[str] = []
@@ -287,7 +288,16 @@ class ModbusCoordinator(DataUpdateCoordinator[dict[str, Any]]):
           (entity disponibili, anche se alcune aree possono restare stale/None).
         - Se tutte le letture falliscono -> UpdateFailed -> entity unavailable.
         """
-
+        def elapsed_fmt() -> str:
+            elapsed_ms = (time.perf_counter() - start) * 1000.0
+            total_ms = int(elapsed_ms)
+            minutes = total_ms // 60000
+            seconds = (total_ms % 60000) // 1000
+            milliseconds = total_ms % 1000
+            return f"{minutes:02d}:{seconds:02d}:{milliseconds:03d}"
+        
+        start = time.perf_counter()
+        
         had_success = False
         errors: list[str] = []
 
@@ -306,11 +316,13 @@ class ModbusCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     entity_constraint_id=device_config.entity_constraint
                 )
 
-                
                 if isinstance(register_result, str):
                     errors.append(register_result)
                 else:
                     had_success = True
+
+                # log_info(_LOGGER, "[board=%s area=%s] elapsed=%s", board, RegisterAreaName(area), elapsed_fmt())
+
 
         if not had_success:
             # Nessuna lettura è andata a buon fine → consideriamo l'update fallito
@@ -324,7 +336,13 @@ class ModbusCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 "Some Modbus read operations failed " + " | ".join(errors)
             )
 
+        if self.update_interval is not None and (time.perf_counter() - start) > self.update_interval.total_seconds():
+            log_warning(
+                _LOGGER, 
+                "[hub=%s] elapsed=%s > update_interval=%s", 
+                self._name, (time.perf_counter() - start), self.update_interval.total_seconds()
+            )
+
         # I dati usati dalle entity sono in hass.data[DOMAIN][DEVICE_AREAS_DATA]
         return {}
-
 

@@ -96,6 +96,7 @@ class RuntimeEntryConfig:
     host: str
     port: int
     type: str  # one of TCP, UDP, RTUOVERTCP
+    scan_interval: int
 
     boards: List[Board] = field(default_factory=list)
     devices: List[DeviceConfig] = field(default_factory=list)

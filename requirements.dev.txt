@@ -1,0 +1,16 @@
+-r requirements.txt
+
+# Versione di Home Assistant usata per i test
+homeassistant==2025.10.4
+
+# Test
+pytest
+pytest-cov
+pytest-homeassistant-custom-component
+
+# Lint/format/type-check
+ruff
+black
+mypy
+flake8
+pylint

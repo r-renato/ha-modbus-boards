@@ -88,7 +88,7 @@ class BaseEntityClass(CoordinatorEntity[ModbusCoordinator], Entity):
             log_warning(
                 _LOGGER,
                 "(board=%s, slave=%s, function=%s)",
-                board, slave, board_name, self._device_function
+                board, slave, self._device_function
             )
             raise ValueError("Required attribute 'device_function' in config")
 
@@ -249,7 +249,7 @@ class BaseEntityClass(CoordinatorEntity[ModbusCoordinator], Entity):
             # Nessun dato ancora disponibile per quest'area
             self._set_invalid_entity_value(platform=platform)
             self.async_write_ha_state()
-            log_debug(
+            log_warning(
                 _LOGGER,
                 "(board=%s, slave=%s, function=%s, constraint_state=%s) No modbus response data.",
                 self._board, self._slave, self._device_function, constraint_state

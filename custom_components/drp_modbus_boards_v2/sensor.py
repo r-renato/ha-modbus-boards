@@ -209,90 +209,9 @@ class DrpModbusSensor(BaseEntityClass, SensorEntity):
 
         return data
 
-    # ---------------------------------------------------------------------
-    # Integrazione con il DataUpdateCoordinator
-    # ---------------------------------------------------------------------
-    # def _handle_coordinator_update_cccc(self) -> None:
-    #     """Aggiorna lo stato in base ai dati letti dal ModbusCoordinator."""
-        
-    #     # Recupera la risposta Modbus per l'area di interesse
-    #     modbus_registers_response: ModbusRegistersResponse | None = get_stored_board_data_area(
-    #         hass=self._hass,
-    #         key=self._board_data_area_key,
-    #     )
-
-    #     log_debug(_LOGGER, "stored key='%s' data='%s'", self._board_data_area_key, modbus_registers_response)
-
-    #     if modbus_registers_response is None:
-    #         # Nessun dato ancora disponibile per quest'area
-    #         self._attr_native_value = None
-    #         self.async_write_ha_state()
-    #         log_warning(
-    #             _LOGGER,
-    #             "(board=%s, slave=%s, function=%s) No modbus response data.",
-    #             self._board, self._slave, self._device_function
-    #         )
-    #         return
-
-    #     if not self._register_function:
-    #         # Se non ho una RegisterFunction valida, non posso decodificare
-    #         self._attr_native_value = None
-    #         self.async_write_ha_state()
-    #         log_warning(
-    #             _LOGGER,
-    #             "(board=%s, slave=%s, function=%s) No register function for the board.",
-    #             self._board, self._slave, self._device_function
-    #         )
-    #         return
-
-    #     try:
-    #         address = cast(int, self._register_function.address)
-    #         modbus_response = modbus_registers_response.registers_response
-
-    #         # Valore grezzo dal blocco di registri
-    #         raw_value = get_value_from_stored_board_data_area(
-    #             modbus_response=modbus_response,
-    #             address=address,
-    #             datatype=self._data_type,
-    #         )
-
-    #         # Applica scale e precision definiti nella funzione di lettura
-    #         value = apply_register_read_transform(raw_value=raw_value, offset=self._offset, register_function=self._register_function)
-
-    #         _LOGGER.debug(
-    #             "[sensor] '%s' (key=%s, addr=%s): raw=%s -> value=%s",
-    #             self._attr_name,
-    #             self._board_data_area_key,
-    #             address,
-    #             raw_value,
-    #             value,
-    #         )
-
-    #         if value is not None:
-    #             self._attr_native_value = value
-
-    #     except Exception as err:  # noqa: BLE001
-    #         _LOGGER.debug(
-    #             "[sensor] impossibile decodificare dati per '%s' (key=%s): %s",
-    #             self._attr_unique_id,
-    #             self._board_data_area_key,
-    #             err,
-    #         )
-    #         self._attr_native_value = None
-
-    #     self.async_write_ha_state()
-
     def _handle_coordinator_update(self) -> None:
         """Aggiorna lo stato in base ai dati letti dal ModbusCoordinator."""
 
         self._read_value_from_stored_register(Platform.SENSOR)
-        # value = self._read_modbus_register(Platform.SENSOR)
-
-        # if value is None:
-        #     self._attr_native_value = None
-        #     self._attr_available = False
-        # else:
-        #     self._attr_native_value = value
-        #     self._attr_available = True
 
         # self.async_write_ha_state()

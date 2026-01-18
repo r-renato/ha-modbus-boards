@@ -40,6 +40,7 @@ from homeassistant.const import (
     CONF_TYPE,
     CONF_TIMEOUT,
     CONF_DELAY,
+    CONF_SCAN_INTERVAL,
     CONF_UNIQUE_ID,
     CONF_UNIT_OF_MEASUREMENT,
     CONF_ICON,
@@ -122,6 +123,7 @@ NUMBER_SCHEMA = BASE_COMPONENT_SCHEMA.extend(
 MODBUS_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_NAME, default=DEFAULT_HUB): cv.string,
+        vol.Optional(CONF_SCAN_INTERVAL, default=30): cv.positive_int,
 
         ### Modbus connection parameters for HA Modbus integration
         ### Do not remove these entry block!

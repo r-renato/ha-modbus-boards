@@ -26,6 +26,7 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_PORT,
     CONF_OFFSET,
+    CONF_SCAN_INTERVAL,
     CONF_SENSORS,
     CONF_SWITCHES,
     CONF_TYPE,
@@ -308,6 +309,7 @@ def build_runtime_schema(config: Dict[str, Any]) -> RuntimeEntryConfig:
                 host=config[CONF_HOST],
                 port=config[CONF_PORT],
                 type=config[CONF_TYPE],
+                scan_interval=config[CONF_SCAN_INTERVAL],
                 boards=boards,
                 devices=devices,
             )
