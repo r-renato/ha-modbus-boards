@@ -27,7 +27,7 @@ from ..boards import (
     RegisterFunction,
     RegisterFunctionWrite,
 )
-from ..enums import Board, NumberFunction, RegisterAreaName, SensorFunction
+from ..enums import Board, NumberFunction, RegisterAreaName, SensorFunction, SwitchFunction
 
 # crea una nuova tupla aggiungendo la tua voce
 ensure_number_in_platforms(modbus_const, CONF_NUMBERS)
@@ -56,6 +56,12 @@ def _eletechsup_n4dba06_regs():
                 mdb_read_function=CALL_TYPE_REGISTER_HOLDING,
                 mdb_write_function=CALL_TYPE_WRITE_REGISTER,
                 data_type=DataType.UINT16,
+
+                state_on=True,  # relay state close
+                state_off=False, # relay state open
+
+                command_on=0X0001,  # Relay state close
+                command_off=0X0000, # Relay state open
             )
         },
         registers = {
@@ -134,6 +140,14 @@ def _eletechsup_n4dba06_regs():
                         max=100,
 
                         unit_of_measurement=PERCENTAGE
+                    ),
+                }
+            ),
+            Platform.SWITCH: Register(
+                functions={
+                    SwitchFunction.CHANNEL_00: RegisterFunction(
+                        area=RegisterAreaName.AREA_B,
+                        address=0x0083,
                     ),
                 }
             )

@@ -1,9 +1,27 @@
 #!/usr/bin/env bash
-
 set -e
-
 cd "$(dirname "$0")/.."
 echo "Setting up environment in $(pwd)"
+
+# Assicura che pyenv sia inizializzato
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+
+# Installa Python 3.14 se non già presente
+PYTHON_VERSION="3.14"
+if ! pyenv versions --bare | grep -q "^${PYTHON_VERSION}"; then
+  echo "Installing Python ${PYTHON_VERSION} via pyenv..."
+  pyenv install "${PYTHON_VERSION}"
+fi
+
+# Imposta la versione locale per questo progetto
+pyenv local "${PYTHON_VERSION}"
+
+# Ricrea il venv con Python 3.14
+rm -rf venv
 python3 -m venv venv
 source venv/bin/activate
-#python -m pip install --requirement requirements.dev.txt
+
+echo "Python version: $(python3 --version)"
+#python3 -m pip install --requirement requirements.dev.txt

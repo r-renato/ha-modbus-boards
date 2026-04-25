@@ -238,7 +238,11 @@ class BaseEntityClass(CoordinatorEntity[ModbusCoordinator], Entity):
         constraint_state = None
         if self._entity_constraint is not None:
             constraint_state = self._coordinator.entity_constraint_state(self._entity_constraint)
-        
+            if constraint_state is False:
+                self._set_invalid_entity_value(platform=platform)
+                self.async_write_ha_state()
+                return
+            
         # Recupera la risposta Modbus per l'area di interesse
         modbus_registers_response: ModbusRegistersResponse | None = get_stored_board_data_area(
             hass=self._hass,

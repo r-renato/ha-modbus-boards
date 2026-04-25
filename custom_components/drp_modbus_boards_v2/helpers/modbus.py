@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import asyncio
+import itertools
 import logging
 import struct
 from enum import StrEnum
 from typing import Any, Sequence, Union, Iterable, List, Literal, TypeAlias, overload, TypeGuard
+from weakref import WeakKeyDictionary
 
 from homeassistant.components.modbus.modbus import ModbusHub
 from homeassistant.components.modbus.const import DataType
@@ -11,6 +14,66 @@ from homeassistant.components.modbus.const import DataType
 from ..domain.boards import Register, RegisterArea, RegisterFunction
 
 _LOGGER = logging.getLogger(__name__)
+
+_PRIORITY_WRITE = 0
+_PRIORITY_READ = 10
+
+
+class _ModbusRequestQueue:
+    def __init__(self, modbus_hub: ModbusHub) -> None:
+        self._modbus_hub = modbus_hub
+        self._queue: asyncio.PriorityQueue[
+            tuple[int, int, dict[str, Any], asyncio.Future[Any]]
+        ] = asyncio.PriorityQueue()
+        self._counter = itertools.count()
+        self._task = asyncio.create_task(self._run())
+
+    async def _run(self) -> None:
+        while True:
+            priority, _, call_kwargs, future = await self._queue.get()
+            try:
+                result = await self._modbus_hub.async_pb_call(**call_kwargs)
+                if not future.cancelled():
+                    future.set_result(result)
+            except Exception as err:  # noqa: BLE001
+                if not future.cancelled():
+                    future.set_exception(err)
+            finally:
+                self._queue.task_done()
+
+    async def enqueue(self, priority: int, call_kwargs: dict[str, Any]) -> Any:
+        future: asyncio.Future[Any] = asyncio.get_running_loop().create_future()
+        await self._queue.put((priority, next(self._counter), call_kwargs, future))
+        return await future
+
+
+_QUEUE_BY_HUB: WeakKeyDictionary[ModbusHub, _ModbusRequestQueue] = WeakKeyDictionary()
+
+
+def _get_queue(modbus_hub: ModbusHub) -> _ModbusRequestQueue:
+    queue = _QUEUE_BY_HUB.get(modbus_hub)
+    if queue is None:
+        queue = _ModbusRequestQueue(modbus_hub)
+        _QUEUE_BY_HUB[modbus_hub] = queue
+    return queue
+
+
+async def _enqueue_modbus_call(
+    modbus_hub: ModbusHub,
+    *,
+    priority: int,
+    unit: int,
+    address: int,
+    value: int,
+    use_call: str,
+) -> Any:
+    call_kwargs = {
+        "unit": unit,
+        "address": address,
+        "value": value,
+        "use_call": use_call,
+    }
+    return await _get_queue(modbus_hub).enqueue(priority, call_kwargs)
 
 
 # -----------------------------------------------------------------------------
@@ -361,7 +424,9 @@ async def async_modbus_read_area(
     #     register_area.mdb_read_function,
     # )
 
-    result = await modbus.async_pb_call(
+    result = await _enqueue_modbus_call(
+        modbus_hub=modbus,
+        priority=_PRIORITY_READ,
         unit=slave,
         address=register_area.address,
         value=register_area.count,
@@ -403,7 +468,9 @@ async def async_modbus_write_function(
         use_call,
     )
 
-    result = await modbus_hub.async_pb_call(
+    result = await _enqueue_modbus_call(
+        modbus_hub=modbus_hub,
+        priority=_PRIORITY_WRITE,
         unit=slave,
         address=register_address,
         value=value,
@@ -563,4 +630,3 @@ def convert_native_2_register_value(
         return _to_float64(scaled)
 
     raise ValueError(f"Unsupported DataType: {dtype}")
-
