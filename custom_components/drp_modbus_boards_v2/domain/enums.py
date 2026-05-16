@@ -21,6 +21,7 @@ class Board(StrEnum):
     EASTRON_SDM120M = "eastron_sdm120m"
     ELETECHSUP_NT18B07 = "eletechsup_nt18b07"
     ELETECHSUP_N4DBA06 = "eletechsup_n4dba06"
+    ELETECHSUP_N4ROD08 = "eletechsup_n4rod08"
     ELETECHSUP_R4D3B16 = "eletechsup_r4d3b16"
     ELETECHSUP_10IOA04 = "eletechsup_10ioa04"
     ENEREN_RER020I_EFHR0_EVO = "eneren_rer_020i"
